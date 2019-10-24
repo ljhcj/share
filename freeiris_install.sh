@@ -28,11 +28,11 @@ chkconfig mysqld on
 chkconfig iptables off
 
 #用wget下载文件到/usr/local/src/
-wget -P /usr/local/src/ https://gitee.com/ljhcj/share/blob/master/dahdi-linux-complete-2.5.0.2%202.5.0.2.tar.gz
-wget -P /usr/local/src/ https://gitee.com/ljhcj/share/blob/master/libpri-1.4.12.tar.gz
-wget -P /usr/local/src/ https://gitee.com/ljhcj/share/blob/master/asterisk-1.4.43.tar.gz
-wget -P /usr/local/src/ https://gitee.com/ljhcj/share/blob/master/asterisk-addons-1.4.13.tar.gz
-wget -P /usr/local/src/ https://gitee.com/ljhcj/share/blob/master/freeiris2-3.1.524-stable.tar.gz
+wget -P /usr/local/src/ http://112.33.20.58:8070/dahdi-linux-complete-2.5.0.2%202.5.0.2.tar.gz
+wget -P /usr/local/src/ http://112.33.20.58:8070/libpri-1.4.12.tar.gz
+wget -P /usr/local/src/ http://112.33.20.58:8070/asterisk-1.4.43.tar.gz
+wget -P /usr/local/src/ http://112.33.20.58:8070/asterisk-addons-1.4.13.tar.gz
+wget -P /usr/local/src/ http://112.33.20.58:8070/freeiris2-3.1.524-stable.tar.gz
 
 #开始安装部署
 cd /usr/local/src/
