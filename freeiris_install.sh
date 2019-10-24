@@ -15,6 +15,9 @@ EOF
 #低版本系统需要插入认证码
 rpm --import http://centos.ustc.edu.cn/centos/RPM-GPG-KEY-CentOS-5
 
+#关闭selinux
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
+
 #安装基础环境
 yum -y install php-mysql  mysql-devel gcc gcc-c++ libgnomeui-devel bison
 yum -y install ncurses-devel perl-Time-HiRes httpd mysql-server php libdbi-dbd-mysql perl-libwww-perl
@@ -28,11 +31,11 @@ chkconfig mysqld on
 chkconfig iptables off
 
 #用wget下载文件到/usr/local/src/
-wget -P /usr/local/src/ http://112.33.20.58:8070/dahdi-linux-complete-2.5.0.2%202.5.0.2.tar.gz
+wget -P /usr/local/src/ http://112.33.20.58:8070/dahdi-linux-complete-2.5.0.2+2.5.0.2.tar.gz
 wget -P /usr/local/src/ http://112.33.20.58:8070/libpri-1.4.12.tar.gz
 wget -P /usr/local/src/ http://112.33.20.58:8070/asterisk-1.4.43.tar.gz
 wget -P /usr/local/src/ http://112.33.20.58:8070/asterisk-addons-1.4.13.tar.gz
-wget -P /usr/local/src/ http://112.33.20.58:8070/freeiris2-3.1.524-stable.tar.gz
+wget -P /usr/local/src/ http://112.33.20.58:8070/freeiris2-current.tar.gz
 
 #开始安装部署
 cd /usr/local/src/
