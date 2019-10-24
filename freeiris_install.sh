@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#以下说明都以Centos 5.6为例
+#下面操作在centos 5.6安装成功后操作
 #修改yum源路径地址
 tee /etc/yum.repos.d/CentOS-Base.repo <<-'EOF'
 [base]
