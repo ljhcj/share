@@ -17,8 +17,9 @@ EOF
 #低版本系统需要插入认证码
 rpm --import http://centos.ustc.edu.cn/centos/RPM-GPG-KEY-CentOS-5
 
-#关闭selinux
+#关闭selinux并添加github解析
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
+echo '199.232.68.133 raw.githubusercontent.com' >>/etc/hosts
 
 #安装基础环境
 yum -y install php-mysql  mysql-devel gcc gcc-c++ libgnomeui-devel bison
@@ -33,11 +34,11 @@ chkconfig mysqld on
 chkconfig iptables off
 
 #用wget下载文件到/usr/local/src/
-wget -P /usr/local/src/ http://112.33.20.58:8070/dahdi-linux-complete-2.5.0.2+2.5.0.2.tar.gz
-wget -P /usr/local/src/ http://112.33.20.58:8070/libpri-1.4.12.tar.gz
-wget -P /usr/local/src/ http://112.33.20.58:8070/asterisk-1.4.43.tar.gz
-wget -P /usr/local/src/ http://112.33.20.58:8070/asterisk-addons-1.4.13.tar.gz
-wget -P /usr/local/src/ http://112.33.20.58:8070/freeiris2-current.tar.gz
+wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/dahdi-linux-complete-2.5.0.2%2B2.5.0.2.tar.gz
+wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/libpri-1.4.12.tar.gz
+wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/asterisk-1.4.43.tar.gz
+wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/asterisk-addons-1.4.13.tar.gz
+wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/freeiris2-current.tar.gz
 
 #开始安装部署
 ######################################################################################
@@ -103,7 +104,7 @@ EOF
 替换路由文件
 ######################################################################################
 rm -rf /freeiris2/agimod/router.dynamic
-wget -P /freeiris2/agimod/ http://112.33.20.58:8070/router.dynamic
+wget -P /freeiris2/agimod/ https://raw.githubusercontent.com/ljhcj/share/master/router.dynamic
 chown 500:500 /freeiris2/agimod/router.dynamic
 chmod 775 /freeiris2/agimod/router.dynamic
 
