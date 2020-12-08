@@ -34,11 +34,11 @@ chkconfig mysqld on
 chkconfig iptables off
 
 #用wget下载文件到/usr/local/src/并解压
-wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/dahdi-linux-complete-2.5.0.2%2B2.5.0.2.tar.gz  -O - | tar xfz - 
-wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/libpri-1.4.12.tar.gz  -O - | tar xfz - 
-wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/asterisk-1.4.43.tar.gz  -O - | tar xfz - 
-wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/asterisk-addons-1.4.13.tar.gz  -O - | tar xfz - 
-wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/freeiris2-current.tar.gz  -O - | tar xfz - 
+wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/dahdi-linux-complete-2.5.0.2%2B2.5.0.2.tar.gz
+wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/libpri-1.4.12.tar.gz
+wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/asterisk-1.4.43.tar.gz
+wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/asterisk-addons-1.4.13.tar.gz
+wget -P /usr/local/src/ https://github.com/ljhcj/share/raw/master/freeiris2-current.tar.gz
 
 #开始安装部署
 ######################################################################################
