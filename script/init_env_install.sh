@@ -7,6 +7,7 @@ echoYellow() { echo $'\e[0;33m'"$1"$'\e[0m'; }
 #ENV#
 dir=`pwd`
 nginx_version=1.18.0
+tomcat_version=9.0.40
 #判断一下当前用户
 if [ "`whoami`" != "root" ];then
     echoRed "注意：当前系统用户非root用户，将无法执行安装等事宜！" && exit 1
@@ -51,10 +52,10 @@ systemctl enable nginx.service && systemctl start nginx.service
 
 tomcat(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
-    [ -d /usr/local/tomcat ] && echoRed "检测到/usr/local下已安装tomcat，故而退出！" && rm -rf $dir && exit 1
-    wget $ip/pack/tomcat.tar.gz && tar xf tomcat.tar.gz && mv tomcat /usr/local/tomcat
+    [ -d /usr/local/tomcat ] && echoRed "检测到/usr/local下已安装tomcat，故而退出！" && rm -rf $dir/apache-tomcat-* && exit 1
+    wget -nc https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.40/bin/apache-tomcat-${tomcat_version}.tar.gz && tar xf apache-tomcat-${tomcat_version}.tar.gz && mv apache-tomcat-${tomcat_version} /usr/local/tomcat
     /usr/local/tomcat/bin/version.sh &> /dev/null  && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
-    rm -rf $dir
+    rm -rf $dir/apache-tomcat-*
 }
 jdk8(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
