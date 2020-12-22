@@ -60,11 +60,11 @@ tomcat(){
 }
 jdk13(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
-    java -version &> /dev/null && echoRed "检测到系统中有java命令，故而退出！" && rm -rf $dir && exit 1
+    java -version &> /dev/null && echoRed "检测到系统中有java命令，故而退出！" && rm -rf $dir/jdk-* && exit 1
     wget -nc https://mirrors.huaweicloud.com/java/jdk/13+33/jdk-${jdk_version}_linux-x64_bin.tar.gz && tar xf jdk-${jdk_version}_linux-x64_bin.tar.gz -C /usr/local/
     echo 'JAVA_HOME=/usr/local/jdk-13' >> /etc/profile && echo 'PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile && echo 'export PATH' >> /etc/profile && source /etc/profile
     /usr/local/jdk-13/bin/java -version &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
-    S && rm -rf $dir
+    S && rm -rf $dir/jdk-*
 }
 mysql(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
