@@ -22,7 +22,7 @@ S(){
 #install
 nginx(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
-    [ -d /usr/local/nginx ] && echoRed "检测到/usr/local下已安装ngixn，故而退出!" && rm -rf nginx-* && exit 1
+    [ -d /usr/local/nginx ] && echoRed "检测到/usr/local下已安装ngixn，故而退出!" && rm -rf $dir/nginx-* && exit 1
     [ ! -f $dir/nginx-${nginx_version}.tar.gz ] && wget -nc http://nginx.org/download/nginx-${nginx_version}.tar.gz
     yum install gcc gcc-c++ pcre pcre pcre-devel zlib zlib-devel openssl openssl-devel -y
     tar -xvzf nginx-${nginx_version}.tar.gz && cd nginx-${nginx_version} 
@@ -30,7 +30,7 @@ nginx(){
     --with-http_realip_module && make && make install
     ln -s /usr/local/nginx/sbin/nginx /usr/local/sbin
     /usr/local/nginx/sbin/nginx -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
-    rm -rf nginx-*
+    rm -rf $dir/nginx-*
     cat <<EOF > /lib/systemd/system/nginx.service
     [Unit]
     Description=nginx service
