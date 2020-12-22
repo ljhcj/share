@@ -30,7 +30,7 @@ nginx(){
     --with-http_realip_module && make && make install
     ln -s /usr/local/nginx/sbin/nginx /usr/local/sbin
     /usr/local/nginx/sbin/nginx -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
-    rm -rf nginx-*
+    rm -rf nginx-${nginx_version}.*
     cat <<EOF > /lib/systemd/system/nginx.service
     [Unit]
     Description=nginx service
