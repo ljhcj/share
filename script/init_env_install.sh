@@ -8,6 +8,7 @@ echoYellow() { echo $'\e[0;33m'"$1"$'\e[0m'; }
 dir=`pwd`
 nginx_version=1.18.0
 tomcat_version=9.0.40
+jdk_version=13
 #判断一下当前用户
 if [ "`whoami`" != "root" ];then
     echoRed "注意：当前系统用户非root用户，将无法执行安装等事宜！" && exit 1
@@ -57,12 +58,12 @@ tomcat(){
     /usr/local/tomcat/bin/version.sh &> /dev/null  && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
     rm -rf $dir/apache-tomcat-*
 }
-jdk8(){
+jdk13(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     java -version &> /dev/null && echoRed "检测到系统中有java命令，故而退出！" && rm -rf $dir && exit 1
-    wget $ip/pack/jdk-8u192-linux-x64.tar.gz -O jdk.tar.gz && tar xf jdk.tar.gz -C /usr/local/
-    echo 'JAVA_HOME=/usr/local/jdk1.8.0_192' >> /etc/profile && echo 'PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile && echo 'export PATH' >> /etc/profile && source /etc/profile
-    /usr/local/jdk1.8.0_192/bin/java -version &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
+    wget -nc https://mirrors.huaweicloud.com/java/jdk/13+33/jdk-${jdk_version}_linux-x64_bin.tar.gz && tar xf jdk-${jdk_version}_linux-x64_bin.tar.gz -C /usr/local/
+    echo 'JAVA_HOME=/usr/local/jdk-${jdk_version}' >> /etc/profile && echo 'PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile && echo 'export PATH' >> /etc/profile && source /etc/profile
+    /usr/local/jdk-${jdk_version}/bin/java -version &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
     S && rm -rf $dir
 }
 mysql(){
@@ -196,7 +197,7 @@ anzhuang(){
         A && nginx
         ;;
     2)
-        A && jdk8
+        A && jdk13
         ;;
     3)
         A && tomcat
