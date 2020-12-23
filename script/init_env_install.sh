@@ -55,7 +55,7 @@ tomcat(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/tomcat ] && echoRed "检测到/usr/local下已安装tomcat，故而退出！" && rm -rf $dir/apache-tomcat-* && exit 1
     wget -nc https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.40/bin/apache-tomcat-${tomcat_version}.tar.gz && tar xf apache-tomcat-${tomcat_version}.tar.gz && mv apache-tomcat-${tomcat_version} /usr/local/tomcat
-    /usr/local/tomcat/bin/version.sh &> /dev/null  && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
+    /usr/local/tomcat/bin/version.sh &> /dev/null  && echo 'export JAVA_HOME=/usr/local/jdk-13' >> /usr/local/tomcat/bin/catalina.sh && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
     rm -rf $dir/apache-tomcat-*
 }
 jdk13(){
@@ -186,11 +186,11 @@ A(){
 
 anzhuang(){
     OPTION=$(whiptail --title "运维外挂-安装脚本" --menu "请选择想要安装的项目，上下键进行选择，回车即安装，左右键可选择<Cancel>返回上层！" 25 55 15 \
-        "1" "nginx" \
-        "2" "jdk" \
-        "3" "tomcat" \
-        "4" "mysql" \
-        "5" "zabbix-agent" \
+        "1" "nginx-1.18.0" \
+        "2" "jdk-13" \
+        "3" "tomcat-9.0.40" \
+        "4" "mysql-5.7" \
+        "5" "zabbix-agent-5.0" \
         "6" "暂时未定义"  3>&1 1>&2 2>&3  )
     case $OPTION in
     1)
