@@ -65,7 +65,7 @@ jdk13(){
 mysql(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/mysql ] && echoRed "检测到/usr/local下已安装mysql，故而退出！" && rm -rf $dir/mysql-* && exit 1
-    wget -nchttps://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.20.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
+    wget -nc https://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.20.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
     if [ $mqnu -ne 1 ];then
         echoRed "mysql用户不存在，新建用户" && groupadd mysql && useradd -g mysql -s /sbin/nologin mysql
     else
