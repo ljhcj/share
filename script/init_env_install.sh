@@ -69,7 +69,7 @@ EOF
     [Install]
     WantedBy=multi-user.target
 EOF
-    chmod 777 /etc/rc.d/rc.local && /usr/local/tomcat/bin/startup.sh start &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
+    /usr/local/tomcat/bin/startup.sh start &> /dev/null && chmod 777 /etc/rc.d/rc.local && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
     rm -rf $dir/apache-tomcat-*
 }
 
