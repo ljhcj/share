@@ -65,15 +65,15 @@ jdk13(){
 mysql(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/mysql ] && echoRed "检测到/usr/local下已安装mysql，故而退出！" && rm -rf $dir/mysql-* && exit 1
-    wget -nc https://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.20.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
+    wget -nc https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.31.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
     if [ $mqnu -ne 1 ];then
         echoRed "mysql用户不存在，新建用户" && groupadd mysql && useradd -g mysql -s /sbin/nologin mysql
     else
         echoRed "mysql已经存在"
     fi
-    yum install gcc gcc-c++ autoconf automake zlib* libxml* ncurses-devel libtool-ltdl-devel* make cmake3 -y
+    yum install gcc gcc-c++ autoconf automake zlib* libxml* ncurses-devel libtool-ltdl-devel* make cmake -y
     [ ! -d /usr/local/mysql/data ] && mkdir -p /usr/local/mysql/data && chown -R mysql.mysql /usr/local/mysql
-    echoGreen "开始编译安装！！" && tar -xf mysql-8.0.20.tar.gz && cd mysql-8.0.20 && cmake3 . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci && make && make install
+    echoGreen "开始编译安装！！" && tar -xf mysql-5.7.31.tar.gz && cd mysql-5.7.31 && cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci && make && make install
     echoGreen "注册为服务！！" && cd /usr/local/mysql/scripts && ./mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data
     cd /usr/local/mysql/support-files && cp mysql.server /etc/rc.d/init.d/mysql && yes | cp my-default.cnf /etc/my.cnf && chkconfig --add mysql && chkconfig mysql on && service mysql start
     echo 'PATH=/usr/local/mysql/bin:$PATH' >> /etc/profile
