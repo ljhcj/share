@@ -55,7 +55,11 @@ tomcat(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/tomcat ] && echoRed "检测到/usr/local下已安装tomcat，故而退出！" && rm -rf $dir/apache-tomcat-* && exit 1
     wget -nc https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.40/bin/apache-tomcat-${tomcat_version}.tar.gz && tar xf apache-tomcat-${tomcat_version}.tar.gz && mv apache-tomcat-${tomcat_version} /usr/local/tomcat
-    echo 'export JAVA_HOME=/usr/local/jdk-13' >> /usr/local/tomcat/bin/catalina.sh && /usr/local/tomcat/bin/version.sh &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
+    cat <<EOF > /etc/rc.d/rc.local
+    export JAVA_HOME=/usr/local/jdk-13
+    /usr/local/tomcat/bin/startup.sh start
+EOF
+    chmod 777 /etc/rc.d/rc.local && /usr/local/tomcat/bin/startup.sh start &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
     rm -rf $dir/apache-tomcat-*
 }
 
