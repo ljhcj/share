@@ -70,7 +70,7 @@ jdk13(){
 mysql(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/mysql ] && echoRed "检测到/usr/local下已安装mysql，故而退出！" && rm -rf $dir/mysql-* && exit 1
-    wget -nc http://mirrors.ustc.edu.cn/mysql-ftp/Downloads/MySQL-8.0/mysql-8.0.22-el7-x86_64.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
+    wget -nc https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.22-el7-x86_64.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
     if [ $mqnu -ne 1 ];then
         echoRed "mysql用户不存在，新建用户" && groupadd mysql && useradd -g mysql -s /sbin/nologin mysql
     else
