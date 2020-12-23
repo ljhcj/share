@@ -7,8 +7,6 @@ echoYellow() { echo $'\e[0;33m'"$1"$'\e[0m'; }
 #ENV#
 dir=`pwd`
 nginx_version=1.18.0
-tomcat_version=9.0.40
-jdk_version=13
 #判断一下当前用户
 if [ "`whoami`" != "root" ];then
     echoRed "注意：当前系统用户非root用户，将无法执行安装等事宜！" && exit 1
@@ -52,7 +50,7 @@ systemctl enable nginx.service && systemctl start nginx.service
 tomcat(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/tomcat ] && echoRed "检测到/usr/local下已安装tomcat，故而退出！" && rm -rf $dir/apache-tomcat-* && exit 1
-    wget -nc https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.40/bin/apache-tomcat-${tomcat_version}.tar.gz && tar xf apache-tomcat-${tomcat_version}.tar.gz && mv apache-tomcat-${tomcat_version} /usr/local/tomcat
+    wget -nc https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.40/bin/apache-tomcat-9.0.40.tar.gz && tar xf apache-tomcat-9.0.40.tar.gz && mv apache-tomcat-9.0.40 /usr/local/tomcat
     cat <<EOF > /etc/rc.d/rc.local
     export JAVA_HOME=/usr/local/jdk-13
     /usr/local/tomcat/bin/startup.sh start
@@ -64,15 +62,15 @@ EOF
 jdk13(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     java -version &> /dev/null && echoRed "检测到系统中有java命令，故而退出！" && exit 1
-    wget -nc https://mirrors.huaweicloud.com/java/jdk/13+33/jdk-${jdk_version}_linux-x64_bin.tar.gz && tar xf jdk-${jdk_version}_linux-x64_bin.tar.gz -C /usr/local/
+    wget -nc https://mirrors.huaweicloud.com/java/jdk/13+33/jdk-13_linux-x64_bin.tar.gz && tar xf jdk-13_linux-x64_bin.tar.gz -C /usr/local/
     echo 'export JAVA_HOME=/usr/local/jdk-13' >> /etc/profile && echo 'export JRE_HOME=/${JAVA_HOME}' >> /etc/profile && echo 'export CLASSPATH=.:${JAVA_HOME}/libss:${JRE_HOME}/lib' >> /etc/profile && echo 'export PATH=${JAVA_HOME}/bin:$PATH' >> /etc/profile&& source /etc/profile
     /usr/local/jdk-13/bin/java -version &> /dev/null && source /etc/profile && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
     rm -rf $dir/jdk-*.tar.gz 
 }
 mysql(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
-    [ -d /usr/local/mysql ] && echoRed "检测到/usr/local下已安装mysql，故而退出！" && rm -rf $dir && exit 1
-    wget $ip/pack/mysql-5.6.16.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
+    [ -d /usr/local/mysql ] && echoRed "检测到/usr/local下已安装mysql，故而退出！" && rm -rf $dir/mysql-* && exit 1
+    wget -nc http://mirrors.ustc.edu.cn/mysql-ftp/Downloads/MySQL-8.0/mysql-8.0.22-el7-x86_64.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
     if [ $mqnu -ne 1 ];then
         echoRed "mysql用户不存在，新建用户" && groupadd mysql && useradd -g mysql -s /sbin/nologin mysql
     else
@@ -80,13 +78,13 @@ mysql(){
     fi
     yum install gcc gcc-c++ autoconf automake zlib* libxml* ncurses-devel libtool-ltdl-devel* make cmake -y
     [ ! -d /usr/local/mysql/data ] && mkdir -p /usr/local/mysql/data && chown -R mysql.mysql /usr/local/mysql
-    echoGreen "开始编译安装！！" && tar -xf mysql-5.6.16.tar.gz && cd mysql-5.6.16 && cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci && make && make install
+    echoGreen "开始编译安装！！" && tar -xf mysql-8.0.22-el7-x86_64.tar.gz && cd mysql-8.0.22 && cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci && make && make install
     echoGreen "注册为服务！！" && cd /usr/local/mysql/scripts && ./mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data
     cd /usr/local/mysql/support-files && cp mysql.server /etc/rc.d/init.d/mysql && yes | cp my-default.cnf /etc/my.cnf && chkconfig --add mysql && chkconfig mysql on && service mysql start
     echo 'PATH=/usr/local/mysql/bin:$PATH' >> /etc/profile
     echo 'export PATH' >> /etc/profile && source /etc/profile
     /usr/local/mysql/bin/mysql -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
-    S && rm -rf $dir
+    S && rm -rf $dir/mysql-*
 }
 zabbix(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
