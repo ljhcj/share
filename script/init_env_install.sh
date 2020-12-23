@@ -37,14 +37,12 @@ nginx(){
     [Unit]
     Description=nginx service
     After=network.target
-
     [Service]
     Type=forking
     ExecStart=/usr/local/nginx/sbin/nginx
     ExecReload=/usr/local/nginx/sbin/nginx -s reload
     ExecStop=/usr/local/nginx/sbin/nginx -s quit
     PrivateTmp=true
-
     [Install]
     WantedBy=multi-user.target
 EOF
@@ -59,7 +57,19 @@ tomcat(){
     export JAVA_HOME=/usr/local/jdk-13
     /usr/local/tomcat/bin/startup.sh start
 EOF
-    chmod 777 /etc/rc.d/rc.local && /usr/local/tomcat/bin/startup.sh start &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
+    cat <<EOF > /lib/systemd/system/tomcat.service
+    [Unit]
+    Description=tomcat service
+    After=network.target
+    [Service]
+    Type=forking
+    ExecStart=/usr/local/tomcat/bin/startup.sh start
+    ExecStop=/usr/local/tomcat/bin/shutdown.sh stop
+    PrivateTmp=true
+    [Install]
+    WantedBy=multi-user.target
+EOF
+    chmod 777 /etc/rc.d/rc.local && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
     rm -rf $dir/apache-tomcat-*
 }
 
