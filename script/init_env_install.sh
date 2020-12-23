@@ -73,7 +73,7 @@ mysql(){
     fi
     yum install gcc gcc-c++ autoconf automake zlib* libxml* ncurses-devel libtool-ltdl-devel* make cmake -y
     [ ! -d /usr/local/mysql/data ] && mkdir -p /usr/local/mysql/data && chown -R mysql.mysql /usr/local/mysql
-    echoGreen "开始编译安装！！" && tar -xf mysql-5.7.31.tar.gz && cd mysql-5.7.31 && mkdir -p /usr/local/boost && wget -nc http://www.sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz && tar -xvf boost_1_59_0.tar.gz
+    echoGreen "开始编译安装！！" && tar -xf mysql-5.7.31.tar.gz && cd mysql-5.7.31 && mkdir -p /usr/local/boost && wget -nc https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.gz && tar -xvf boost_1_75_0.tar.gz
     cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DWITH_BOOST=/usr/local/boost/ -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci && make && make install
     echoGreen "注册为服务！！" && cd /usr/local/mysql/scripts && ./mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data
     cd /usr/local/mysql/support-files && cp mysql.server /etc/rc.d/init.d/mysql && yes | cp my-default.cnf /etc/my.cnf && chkconfig --add mysql && chkconfig mysql on && service mysql start
