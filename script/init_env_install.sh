@@ -57,18 +57,6 @@ tomcat(){
     export JAVA_HOME=/usr/local/jdk-13
     /usr/local/tomcat/bin/startup.sh start
 EOF
-    cat <<EOF > /lib/systemd/system/tomcat.service
-    [Unit]
-    Description=tomcat service
-    After=network.target
-    [Service]
-    Type=forking
-    ExecStart=/usr/local/tomcat/bin/startup.sh start
-    ExecStop=/usr/local/tomcat/bin/shutdown.sh stop
-    PrivateTmp=true
-    [Install]
-    WantedBy=multi-user.target
-EOF
     /usr/local/tomcat/bin/startup.sh start &> /dev/null && chmod 777 /etc/rc.d/rc.local && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
     rm -rf $dir/apache-tomcat-*
 }
