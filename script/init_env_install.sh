@@ -70,7 +70,7 @@ jdk13(){
 mysql(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/mysql ] && echoRed "检测到/usr/local下已安装mysql，故而退出！" && rm -rf $dir/mysql-* && exit 1
-    wget -nc https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.31.tar.gz && wget -nc http://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz && tar -xvf boost_1_59_0.tar.gz && mkdir -p /usr/local/boost && mqnu=`cat /etc/passwd | grep mysql |wc -l`
+    wget -nc https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.31.tar.gz && wget -nc -P /usr/local/boost/ http://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz && tar -xvf boost_1_59_0.tar.gz && mkdir -p /usr/local/boost && mqnu=`cat /etc/passwd | grep mysql |wc -l`
     if [ $mqnu -ne 1 ];then
         echoRed "mysql用户不存在，新建用户" && groupadd mysql && useradd -g mysql -s /sbin/nologin mysql
     else
@@ -88,7 +88,7 @@ mysql(){
 }
 zabbix(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
-    zabbix_agentd -V &> /dev/null && echoRed "检测到系统中有zabbix-agentd命令，故而退出！" && rm -rf $dir && exit 1
+    zabbix_agentd -V &> /dev/null && echoRed "检测到系统中有zabbix-agentd命令，故而退出！" && rm -rf $dir/zabbix-* && exit 1
     wget $ip/pack/zabbix-agent-3.4.11-1.el7.x86_64.rpm && yum -y install $dir/zabbix-agent-3.4.11-1.el7.x86_64.rpm
     #修改相应的配置文件
     sed -i "s/^Server=.*/Server=$zabbixserver/g"  /etc/zabbix/zabbix_agentd.conf
@@ -96,7 +96,7 @@ zabbix(){
     sed -i "s/^Hostname=.*/Hostname=$(hostname -I)/g"  /etc/zabbix/zabbix_agentd.conf
     systemctl enable zabbix-agent && systemctl restart zabbix-agent
     zabbix_agentd -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
-    rm -rf $dir
+    rm -rf $dir/zabbix-*
 }
 
 #chushihua
@@ -127,7 +127,7 @@ changeipaddress(){
             #判断文件是否规范
             [ ! -e /etc/sysconfig/network-scripts/ifcfg-eth0 ]   && echo -e "\n网卡配置文件不规范，请检查 ：\n  /etc/sysconfig/network-scripts/ifcfg-eth0\n"  &&  rm -rf $dir  &&  exit 1
             #判断IP是否可用
-            ping -c 2 $changeip  > /dev/null && echo -e "\n[$changeip]\n 该IP已在使用中，请检查\n"   && rm -rf $dir && exit 1 || echo "该IP可用"
+            ping -c 2 $changeip  > /dev/null && echo -e "\n[$changeip]\n 该IP已在使用中，请检查\n" && exit 1 || echo "该IP可用"
             #执行
             #       echo "$(hostname -I) >>> $changeip"
             sed -i 's/dhcp/static/i'  /etc/sysconfig/network-scripts/ifcfg-eth0
@@ -143,7 +143,6 @@ changeipaddress(){
             systemctl restart zabbix-agent
             echo -e "\n修改完毕，请手动重启网卡:\n    systemctl restart network\n"
             #systemctl restart network
-            rm -rf $dir
         else
             echo "输入的IP不合法"
         fi
