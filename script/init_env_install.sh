@@ -14,7 +14,7 @@ fi
 #---------------------------------------------------------------------------------------------------------------------------------------------
 #               三级方法
 #---------------------------------------------------------------------------------------------------------------------------------------------
-A(){
+B(){
     echo "---------------------------------"
     echo "mysql默认用户名为root，默认密码为空 "
     echo "---------------------------------"
@@ -75,7 +75,7 @@ jdk13(){
 mysql(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/mysql ] && echoRed "检测到/usr/local下已安装mysql，故而退出！" && rm -rf $dir/mysql-* && exit 1
-    wget -nc https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.31.tar.gz && wget -nc -P /usr/local/boost/ http://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz && tar -xvf boost_1_59_0.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
+    wget -nc https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.31.tar.gz && wget -nc -P /usr/local/boost/ https://gitee.com/ljhcj/share/raw/master/fast_install/boost_1_59_0.tar.gz && tar -xvf boost_1_59_0.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
     if [ $mqnu -ne 1 ];then
         echoRed "mysql用户不存在，新建用户" && groupadd mysql && useradd -g mysql -s /sbin/nologin mysql
     else
@@ -107,7 +107,7 @@ mysql(){
 EOF
     systemctl enable mysqld && systemctl start  mysqld
     /usr/local/mysql/bin/mysql -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
-    A rm -rf $dir/mysql-*
+    B rm -rf $dir/mysql-*
 }
 zabbix(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
