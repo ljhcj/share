@@ -14,6 +14,11 @@ fi
 #---------------------------------------------------------------------------------------------------------------------------------------------
 #               三级方法
 #---------------------------------------------------------------------------------------------------------------------------------------------
+A(){
+    echo "---------------------------------"
+    echo "mysql默认用户名为root，默认密码为空 "
+    echo "---------------------------------"
+}
 S(){
     echo "--------------------------------------------------------------------------"
     echo "如果环境变量未生效，请运行source /etc/profile && source /etc/bashrc安装完成！"
@@ -77,14 +82,32 @@ mysql(){
         echoRed "mysql已经存在"
     fi
     yum install gcc gcc-c++ autoconf automake zlib* libxml* ncurses-devel libtool-ltdl-devel* make cmake -y
-    [ ! -d /usr/local/mysql/data ] && mkdir -p /usr/local/mysql/data && chown -R mysql.mysql /usr/local/mysql
+    [ ! -d /usr/local/mysql/data ] && mkdir -p /usr/local/mysql/data && mkdir -p /var/log/mariadb/ && mkdir -p /var/run/mariadb/ && chown -R mysql.mysql /usr/local/mysql && chown -R mysql.mysql /var/log/mariadb/ && chown -R mysql.mysql /var/run/mariadb/
     echoGreen "开始编译安装！！" && tar -xf mysql-5.7.31.tar.gz && cd mysql-5.7.31  && cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DWITH_BOOST=/usr/local/boost/ -DDOWNLOAD_BOOST=1 -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci && make && make install
-    echoGreen "注册为服务！！" && cd /usr/local/mysql/scripts && ./mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data
-    cd /usr/local/mysql/support-files && cp mysql.server /etc/rc.d/init.d/mysql && mkdir /var/log/mariadb && mkdir /var/lib/mysql && touch /var/log/mariadb/mariadb.log && chkconfig --add mysql && chkconfig mysql on && chown -R mysql:mysql /var/log/mariadb/ && chmod 777  /var/lib/mysql/ && service mysql start
     echo 'PATH=/usr/local/mysql/bin:$PATH' >> /etc/profile
     echo 'export PATH' >> /etc/profile && source /etc/profile
+    echoGreen "注册为服务！！" && cd /usr/local/mysql/bin/ && ./mysqld --initialize-insecure --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --user=mysql 
+    cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld && chmod 700 /etc/init.d/mysqld
+    cat <<EOF > /usr/local/mysql/my.cnf
+    [mysqld]
+    server_id=1
+    port=3306
+    symbolic-links=0
+    basedir=/usr/local/mysql
+    datadir=/usr/local/mysql/data
+    socket=/var/lib/mysql/mysql.sock 
+    log_bin=/usr/local/mysql/mysql-bin
+    log_error=/var/log/mariadb/mariadb.log
+    character-set-server=utf8
+    pid-file=/var/run/mariadb/mariadb.pid
+    [client]
+    socket=/var/lib/mysql/mysql.sock
+
+    !includedir /etc/my.cnf.d
+EOF
+    systemctl enable mysqld && systemctl start  mysqld
     /usr/local/mysql/bin/mysql -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
-    source /etc/profile 
+    A rm -rf $dir/mysql-*
 }
 zabbix(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
@@ -218,7 +241,8 @@ anzhuang(){
 }
 
 chushihua(){
-    OPTION=$(whiptail --title "运维外挂-初始化菜单" --menu "请选择想要初始化的选项，上下键进行选择，回车即运行，左右键可选择<Cancel>返回上层！" 25 50 10 \
+    OPTION=$(whiptail --title "运维外挂-初始化菜单" --menu \
+    "请选择想要初始化的选项，上下键进行选择，回车即运行，左右键可选择<Cancel>返回上层！" 25 50 10 \
     "1" "虚拟机 moban clone host" \
     "2" "init a new CeontOS" \
     "3" "zabbix agent" \
@@ -247,7 +271,7 @@ chushihua(){
         A && alili
         ;;
     *) 
-        rm -rf $dir && xuanxiang
+        xuanxiang
         ;;
     esac
 }
@@ -256,7 +280,8 @@ chushihua(){
 #               入口菜单
 #---------------------------------------------------------------------------------------------------------------------------------------------
 xuanxiang(){
-    OPTION=$(whiptail --title "运维外挂-一步到位" --menu "请选择想要操作的菜单，回车即可进入！" 30 60 6 \
+    OPTION=$(whiptail --title "运维外挂-一步到位" --menu \
+    "请选择想要操作的菜单，回车即可进入！" 30 60 6 \
     "1" "安装(install service)" \
     "2" "初始化(new initialization)"   3>&1 1>&2 2>&3 )
 
@@ -268,7 +293,7 @@ xuanxiang(){
         chushihua
         ;;
     *) 
-        rm -rf $dir && echo "You chose Cancel."
+        echo "You chose Cancel."
         ;;
     esac
 }
