@@ -80,7 +80,7 @@ mysql(){
     [ ! -d /usr/local/mysql/data ] && mkdir -p /usr/local/mysql/data && chown -R mysql.mysql /usr/local/mysql
     echoGreen "开始编译安装！！" && tar -xf mysql-5.7.31.tar.gz && cd mysql-5.7.31  && cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DWITH_BOOST=/usr/local/boost/ -DDOWNLOAD_BOOST=1 -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci && make && make install
     echoGreen "注册为服务！！" && cd /usr/local/mysql/scripts && ./mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data
-    cd /usr/local/mysql/support-files && cp mysql.server /etc/rc.d/init.d/mysql && mkdir /var/log/mariadb && mkdir /var/lib/mysql && touch /var/log/mariadb/mariadb.log && chkconfig --add mysql && chkconfig mysql on && chown -R mysql:mysql /var/log/mariadb/ && chmod 777  /var/lib/mysql && service mysql start
+    cd /usr/local/mysql/support-files && cp mysql.server /etc/rc.d/init.d/mysql && mkdir /var/log/mariadb && mkdir /var/lib/mysql && touch /var/log/mariadb/mariadb.log && chkconfig --add mysql && chkconfig mysql on && chown -R mysql:mysql /var/log/mariadb/ && chmod 777  /var/lib/mysql/ && service mysql start
     echo 'PATH=/usr/local/mysql/bin:$PATH' >> /etc/profile
     echo 'export PATH' >> /etc/profile && source /etc/profile
     /usr/local/mysql/bin/mysql -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
