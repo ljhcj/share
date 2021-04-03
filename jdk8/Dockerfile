@@ -49,7 +49,7 @@ ENV PATH=$PATH:$JAVA_HOME/bin
 #把java添加到容器中
 #ADD jdk-8u271-linux-x64.tar.gz /usr/local/
 RUN wget -P /usr/local/ http://65.49.211.48/download/jdk-8u271-linux-x64.tar.gz \
-    && cd /usr/local/ && tar -xvf jdk-8u271-linux-x64.tar.gz
+    && cd /usr/local/ && tar -xvf jdk-8u271-linux-x64.tar.gz && rm -rf ./*.tar.gz
 
 #容器运行时对外开放的端口
 EXPOSE 8080
