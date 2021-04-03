@@ -41,7 +41,7 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
         "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
 
 #配置java环境变量
-ENV JAVA_HOME=/usr/local/jdk-8.0.271
+ENV JAVA_HOME=/usr/local/jdk1.8.0_271
 ENV JRE_HOME=$JAVA_HOME/jre
 ENV CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib
 ENV PATH=$PATH:$JAVA_HOME/bin
