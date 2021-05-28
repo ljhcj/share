@@ -2,18 +2,21 @@ FROM alpine:3.13.3
 
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8
 ENV JAVA_HOME=/usr/local/jdk
+ENV JAVA_DOWNLOAD=
 
+ADD glibc-2.33-r0.apk /tmp
 ADD glibc-bin-2.33-r0.apk /tmp
 ADD glibc-i18n-2.33-r0.apk /tmp
 ADD locale.md /tmp
-ADD jdk-8u291-linux-x64.tar.gz /tmp
 COPY ttf-dejavu /usr/share/fonts/
 
 RUN cd /tmp \
     && apk add --update --no-cache --virtual=build-dependencies curl wget tzdata ttf-dejavu bash ca-certificates tar \
     && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
     && apk add --no-cache glibc-2.33-r0.apk glibc-bin-2.33-r0.apk glibc-i18n-2.33-r0.apk \
-    && tar -xzf jdk-8u291-linux-x64.tar.gz -C /usr/local/ \
+    && curl -jfksSLH "Cookie: oraclelicense=accept-securebackup-cookie" \
+    && "${JAVA_DOWNLOAD:-$(curl -s https://lv.binarybabel.org/catalog-api/java/jdk8.txt?p=downloads.tgz)}" \
+    && | tar -xzf - -C /usr/local/
     && ln -s /usr/local/jdk1.*.0_* /usr/local/jdk \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \ 
     && echo "Asia/Shanghai" > /etc/timezone \
