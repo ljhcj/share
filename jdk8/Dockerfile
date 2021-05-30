@@ -16,7 +16,7 @@ RUN cd /tmp \
     && apk add --no-cache glibc-2.33-r0.apk glibc-bin-2.33-r0.apk glibc-i18n-2.33-r0.apk \
     && curl -jfksSLH "Cookie: oraclelicense=accept-securebackup-cookie" \
     && "${JAVA_DOWNLOAD:-$(curl -s https://lv.binarybabel.org/catalog-api/java/jdk8.txt?p=downloads.tgz)}" \
-    && | tar -xzf - -C /usr/local/
+    && | tar -xzf - -C /usr/local/ \
     && ln -s /usr/local/jdk1.*.0_* /usr/local/jdk \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \ 
     && echo "Asia/Shanghai" > /etc/timezone \
