@@ -9,7 +9,6 @@ ADD glibc-bin-2.33-r0.apk /tmp
 ADD glibc-i18n-2.33-r0.apk /tmp
 ADD locale.md /tmp
 ADD ttf-dejavu.tar.gz /tmp
-/usr/share/fonts/
 
 RUN cd /tmp \
     && apk add --update --no-cache --virtual=build-dependencies curl wget tzdata ttf-dejavu bash ca-certificates tar \
