@@ -8,15 +8,17 @@ ADD glibc-2.33-r0.apk /tmp
 ADD glibc-bin-2.33-r0.apk /tmp
 ADD glibc-i18n-2.33-r0.apk /tmp
 ADD locale.md /tmp
-COPY ttf-dejavu /usr/share/fonts/
+ADD ttf-dejavu.tar.gz /tmp
+/usr/share/fonts/
 
 RUN cd /tmp \
     && apk add --update --no-cache --virtual=build-dependencies curl wget tzdata ttf-dejavu bash ca-certificates tar \
     && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
     && apk add --no-cache glibc-2.33-r0.apk glibc-bin-2.33-r0.apk glibc-i18n-2.33-r0.apk \
+    && tar -xvf ttf-dejavu.tar.gz -C /usr/share/fonts/ \
     && curl -jfksSLH "Cookie: oraclelicense=accept-securebackup-cookie" \
-    && "${JAVA_DOWNLOAD:-$(curl -s https://lv.binarybabel.org/catalog-api/java/jdk8.txt?p=downloads.tgz)}" \
-    && | tar -xzf - -C /usr/local/ \
+    "${JAVA_DOWNLOAD:-$(curl -s https://lv.binarybabel.org/catalog-api/java/jdk8.txt?p=downloads.tgz)}" \
+    | tar -xzf - -C /usr/local/ \
     && ln -s /usr/local/jdk1.*.0_* /usr/local/jdk \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \ 
     && echo "Asia/Shanghai" > /etc/timezone \
