@@ -14,28 +14,21 @@ fi
 #---------------------------------------------------------------------------------------------------------------------------------------------
 #               三级方法
 #---------------------------------------------------------------------------------------------------------------------------------------------
-B(){
-    echo "---------------------------------"
-    echo "mysql默认用户名为root，默认密码为空 "
-    echo "---------------------------------"
-}
-S(){
-    echo "--------------------------------------------------------------------------"
-    echo "如果环境变量未生效，请运行source /etc/profile && source /etc/bashrc安装完成！"
-    echo "--------------------------------------------------------------------------"
+A(){
+    echo "--------------------------------------------------------------------------------"
+    echo -e "\033[44;30m请运行source /etc/profile && source ~/.bash_profile安装完成！\033[0m"
+    echo "--------------------------------------------------------------------------------"
 }
 #install
 nginx(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
-    [ -d /usr/local/nginx ] && echoRed "检测到/usr/local下已安装ngixn，故而退出!" && rm -rf $dir/nginx-* && exit 1
+    [ -d /usr/local/nginx ] && echoRed "检测到/usr/local下已安装nginx，故而退出!" && rm -rf $dir/nginx-* && exit 1
     [ ! -f $dir/nginx-${nginx_version}.tar.gz ] && wget -nc http://nginx.org/download/nginx-${nginx_version}.tar.gz
     yum install gcc gcc-c++ pcre pcre pcre-devel zlib zlib-devel openssl openssl-devel -y
     tar -xvzf nginx-${nginx_version}.tar.gz && cd nginx-${nginx_version} 
     ./configure --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-http_v2_module \
     --with-http_realip_module && make && make install
     ln -s /usr/local/nginx/sbin/nginx /usr/local/sbin
-    /usr/local/nginx/sbin/nginx -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
-    rm -rf $dir/nginx-*
     cat <<EOF > /lib/systemd/system/nginx.service
     [Unit]
     Description=nginx service
@@ -49,18 +42,31 @@ nginx(){
     [Install]
     WantedBy=multi-user.target
 EOF
-systemctl enable nginx.service && systemctl start nginx.service
+    systemctl enable nginx.service && systemctl start nginx.service
+    firewall-cmd --permanent --add-port=80/tcp && firewall-cmd --reload
+    /usr/local/nginx/sbin/nginx -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
+    rm -rf $dir/nginx-*
+}
+
+nginx1.16.0(){
+    cd $dir && wget -V &> /dev/null || yum -y install wget
+    [ -d /usr/local/nginx ] && echoRed "检测到/usr/local下已安装nginx，故而退出!" && rm -rf $dir/nginx-* && exit 1
+    wget -nc https://github.com/ljhcj/share/raw/master/nginx-1.16.0.tar.gz && sudo tar -xvf nginx-1.16.0.tar.gz -C /usr/local/
+    yum install gcc gcc-c++ pcre pcre pcre-devel zlib zlib-devel openssl openssl-devel -y
+    cd /usr/local/
+    sudo chown www:www -R client_body_temp/ && sudo chown www:www -R fastcgi_temp/ && sudo chown www:www -R proxy_temp/ && sudo chown www:www -R scgi_temp/ && sudo chown www:www -R uwsgi_temp/
+    cd /usr/local/nginx/sbin/ && sudo cp nginx /etc/init.d/ && sudo mkdir -p /wwwroot/logs/nginx/ && sudo chown www:www -R /wwwroot/logs/nginx/
+    sudo ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx && sudo /etc/init.d/nginx
+    /usr/local/nginx/sbin/nginx -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
 }
 
 tomcat(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/tomcat ] && echoRed "检测到/usr/local下已安装tomcat，故而退出！" && rm -rf $dir/apache-tomcat-* && exit 1
-    wget -nc https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.40/bin/apache-tomcat-9.0.40.tar.gz && tar xf apache-tomcat-9.0.40.tar.gz && mv apache-tomcat-9.0.40 /usr/local/tomcat
-    cat <<EOF > /etc/rc.d/rc.local
-    export JAVA_HOME=/usr/local/jdk-13
-    /usr/local/tomcat/bin/startup.sh start
-EOF
-    /usr/local/tomcat/bin/startup.sh start &> /dev/null && chmod 777 /etc/rc.d/rc.local && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
+    wget -nc https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.40/bin/apache-tomcat-9.0.40.tar.gz && tar -xvzf apache-tomcat-9.0.40.tar.gz && mv apache-tomcat-9.0.40 /usr/local/tomcat
+    cp /usr/local/tomcat/bin/catalina.sh /etc/init.d/ && mv /etc/init.d/catalina.sh /etc/init.d/tomcat && chmod 777 /etc/init.d/tomcat
+    sed -i '2a#chkconfig: 2345 10 90' /etc/init.d/tomcat && sed -i '3a#description: tomcat service' /etc/init.d/tomcat && sed -i '4aexport CATALINA_HOME=/usr/local/tomcat/' /etc/init.d/tomcat && sed -i '5aexport JAVA_HOME=/usr/local/jdk-13' /etc/init.d/tomcat && sed -i '6aexport JAVA_OPTS="$JAVA_OPTS -Duser.timezone=Asia/shanghai"' /etc/init.d/tomcat
+    chkconfig --add tomcat && systemctl start tomcat && chmod 777 /etc/rc.d/rc.local && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
     rm -rf $dir/apache-tomcat-*
 }
 
@@ -68,76 +74,75 @@ jdk13(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     java -version &> /dev/null && echoRed "检测到系统中有java命令，故而退出！" && exit 1
     wget -nc https://mirrors.huaweicloud.com/java/jdk/13+33/jdk-13_linux-x64_bin.tar.gz && tar xf jdk-13_linux-x64_bin.tar.gz -C /usr/local/
-    echo 'export JAVA_HOME=/usr/local/jdk-13' >> /etc/profile && echo 'export JRE_HOME=/${JAVA_HOME}' >> /etc/profile && echo 'export CLASSPATH=.:${JAVA_HOME}/libss:${JRE_HOME}/lib' >> /etc/profile && echo 'export PATH=${JAVA_HOME}/bin:$PATH' >> /etc/profile && source /etc/profile
+    echo 'export JAVA_HOME=/usr/local/jdk-13' >> ~/.bash_profile && echo 'export JRE_HOME=/${JAVA_HOME}' >> ~/.bash_profile && echo 'export CLASSPATH=.:${JAVA_HOME}/libss:${JRE_HOME}/lib' >> ~/.bash_profile && echo 'export PATH=${JAVA_HOME}/bin:$PATH' >> ~/.bash_profile && source ~/.bash_profile
     /usr/local/jdk-13/bin/java -version &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
-    S rm -rf $dir/jdk-*.tar.gz 
+    A && rm -rf $dir/jdk-*.tar.gz
 }
-mysql(){
-    cd $dir && wget -V &> /dev/null || yum -y install wget
-    [ -d /usr/local/mysql ] && echoRed "检测到/usr/local下已安装mysql，故而退出！" && rm -rf $dir/mysql-* && exit 1
-    wget -nc https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.31.tar.gz && wget -nc -P /usr/local/boost/ https://gitee.com/ljhcj/share/raw/master/fast_install/boost_1_59_0.tar.gz && tar -xvf boost_1_59_0.tar.gz && mqnu=`cat /etc/passwd | grep mysql |wc -l`
-    if [ $mqnu -ne 1 ];then
-        echoRed "mysql用户不存在，新建用户" && groupadd mysql && useradd -g mysql -s /sbin/nologin mysql
-    else
-        echoRed "mysql已经存在"
-    fi
-    yum install gcc gcc-c++ autoconf automake zlib* libxml* ncurses-devel libtool-ltdl-devel* make cmake -y
-    [ ! -d /usr/local/mysql/data ] && mkdir -p /usr/local/mysql/data && mkdir -p /var/log/mariadb/ && mkdir -p /var/run/mariadb/ && chown -R mysql.mysql /usr/local/mysql && chown -R mysql.mysql /var/log/mariadb/ && chown -R mysql.mysql /var/run/mariadb/
-    echoGreen "开始编译安装！！" && tar -xf mysql-5.7.31.tar.gz && cd mysql-5.7.31  && cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DWITH_BOOST=/usr/local/boost/ -DDOWNLOAD_BOOST=1 -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci && make && make install
-    echo 'PATH=/usr/local/mysql/bin:$PATH' >> /etc/profile
-    echo 'export PATH' >> /etc/profile && source /etc/profile
-    echoGreen "注册为服务！！" && cd /usr/local/mysql/bin/ && ./mysqld --initialize-insecure --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --user=mysql 
-    cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld && chmod 700 /etc/init.d/mysqld
-    cat <<EOF > /usr/local/mysql/my.cnf
-    [mysqld]
-    server_id=1
-    port=3306
-    symbolic-links=0
-    basedir=/usr/local/mysql
-    datadir=/usr/local/mysql/data
-    socket=/var/lib/mysql/mysql.sock 
-    log_bin=/usr/local/mysql/mysql-bin
-    log_error=/var/log/mariadb/mariadb.log
-    character-set-server=utf8
-    pid-file=/var/run/mariadb/mariadb.pid
-    [client]
-    socket=/var/lib/mysql/mysql.sock
 
-    !includedir /etc/my.cnf.d
-EOF
-    systemctl enable mysqld && systemctl start  mysqld
+mysql(){
+    cd $dir && wget -V &> /dev/null || yum -y install wget lsof bc
+    wget -nc http://ftp.ntu.edu.tw/MySQL/Downloads/MySQL-5.7/mysql-5.7.31-linux-glibc2.12-x86_64.tar.gz && wget -nc https://gitee.com/ljhcj/share/raw/master/fast_install/install_mysql.sh && wget -nc https://gitee.com/ljhcj/share/raw/master/fast_install/my.cnf
+    chmod +x install_mysql.sh && sed -i 's/\r$//' install_mysql.sh && $dir/install_mysql.sh && ln /usr/local/mysql/bin/mysql /usr/bin/mysql
     /usr/local/mysql/bin/mysql -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
-    B rm -rf $dir/mysql-*
 }
-zabbix(){
+
+redis(){
+    cd $dir && wget -V &> /dev/null || yum -y install wget gcc gcc-c++ centos-release-scl && yum install devtoolset-7-gcc* -y && scl enable devtoolset-7 bash && echo "source /opt/rh/devtoolset-7/enable" >> ~/.bash_profile && source /opt/rh/devtoolset-7/enable
+    redis-server -v &> /dev/null && echoRed "检测到系统中有redis-server命令，故而退出！" && rm -rf $dir/redis-* && exit 1
+    wget -nc http://download.redis.io/releases/redis-6.0.6.tar.gz && tar -xf redis-6.0.6.tar.gz -C /usr/local/ && mv /usr/local/redis-6.0.6 /usr/local/redis && cd /usr/local/redis && make && make install
+    sed -i 's#daemonize no#daemonize yes#g' /usr/local/redis/redis.conf && sed -i 's#loglevel notice#loglevel warning#g' /usr/local/redis/redis.conf
+    ln -s /usr/local/redis/src/redis-server /usr/bin/redis-server && ln -s /usr/local/redis/src/redis-server  /etc/init.d/redis-server
+    cat <<EOF > /lib/systemd/system/redis-server.service
+    [Unit]
+    Description=The redis-server Process Manager
+    After=syslog.target network.target
+    [Service]
+    Type=simple
+    PIDFile=/var/run/redis_6379.pid
+    ExecStart=/usr/local/redis/redis-server /usr/local/redis/redis.conf
+    ExecReload=/bin/kill -USR2 $MAINPID
+    ExecStop=/bin/kill -SIGINT $MAINPID
+    [Install]
+    WantedBy=multi-user.target
+EOF
+    systemctl daemon-reload && systemctl start redis-server && systemctl enable redis-server
+    firewall-cmd --zone=public --add-port=6379/tcp --permanent && firewall-cmd --reload && firewall-cmd --zone=public --query-port=6379/tcp
+    /usr/local/redis/src/redis-server /usr/local/redis/redis.conf && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
+    rm -rf $dir/redis-*
+}
+
+docker(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
-    zabbix_agentd -V &> /dev/null && echoRed "检测到系统中有zabbix-agentd命令，故而退出！" && rm -rf $dir/zabbix-* && exit 1
-    wget $ip/pack/zabbix-agent-3.4.11-1.el7.x86_64.rpm && yum -y install $dir/zabbix-agent-3.4.11-1.el7.x86_64.rpm
-    #修改相应的配置文件
-    sed -i "s/^Server=.*/Server=$zabbixserver/g"  /etc/zabbix/zabbix_agentd.conf
-    sed -i "s/^ServerActive=.*/ServerActive=$zabbixserver/g"  /etc/zabbix/zabbix_agentd.conf
-    sed -i "s/^Hostname=.*/Hostname=$(hostname -I)/g"  /etc/zabbix/zabbix_agentd.conf
-    systemctl enable zabbix-agent && systemctl restart zabbix-agent
-    zabbix_agentd -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！" 
-    rm -rf $dir/zabbix-*
+    /usr/bin/docker -version &> /dev/null && echoRed "检测到系统中有docker命令，故而退出！" && exit 1
+    mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup && curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+    curl -o /etc/yum.repos.d/docker-ce.repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo && mkdir -p /etc/docker
+    yum install -y yum-utils device-mapper-persistent-data lvm2 && yum install -y docker-ce docker-ce-cli containerd.io 
+    tee /etc/docker/daemon.json <<-'EOF'
+    {
+      "registry-mirrors": ["https://t2lazqaw.mirror.aliyuncs.com"],
+      "exec-opts": ["native.cgroupdriver=systemd"]
+    }
+EOF
+    systemctl daemon-reload && systemctl enable docker && systemctl restart docker
 }
 
 #chushihua
 allnewcentos(){
-    yum install -y epel-release && mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+    yum install -y epel-release wget && mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
     wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-    yum clean all && yum makecache fast && yum install wget curl net-tools vim lrzsz ntpdate  -y
+    yum clean all && yum makecache fast && yum install unzip gunzip curl net-tools vim lrzsz ntpdate centos-release-scl -y && yum install devtoolset-7 -y && scl enable devtoolset-7 bash && yum groupinstall "Development Tools" -y
     timedatectl set-timezone Asia/Shanghai && /usr/sbin/ntpdate  -u ntp1.aliyun.com  &> /dev/null &
-    echo "export  HISTTIMEFORMAT=\"`whoami` : %F %T :\""  >>  /etc/profile   && source /etc/profile
-    #防火墙
-    getenforce && setenforce 0 && sed -i  's/SELINUX=enforcing/SELINUX=disabled/g'  /etc/selinux/config
-    systemctl status firewalld && systemctl stop firewalld && systemctl disable firewalld && systemctl status firewalld
-    sed -i 's/\\u@\\h\ /\\u@\\H\ /g' /etc/bashrc
+    echo "export  HISTTIMEFORMAT=\"`whoami` : %F %T :\""  >>  /etc/profile   && source /etc/profile && echo "source /opt/rh/devtoolset-7/enable" >> ~/.bash_profile
+    getenforce && setenforce 0 && sed -i  's/SELINUX=enforcing/SELINUX=disabled/g'  /etc/selinux/config && sed -i '/swap/s/^/#/' /etc/fstab
+    systemctl stop firewalld && systemctl disable firewalld
+   # firewall-cmd --permanent --add-port=7788/tcp && firewall-cmd --reload
+   # sed -i 's/\\u@\\h\ /\\u@\\H\ /g' /etc/bashrc && sed -i 's/HISTSIZE=1000/HISTSIZE=5000/g' /etc/profile && sed -i 's/#Port 22/Port 7788/g' /etc/ssh/sshd_config && systemctl restart sshd
+    echo "0 */2 * * *  /usr/sbin/ntpdate  -u ntp1.aliyun.com  &> /dev/null # ntpdate" >> /var/spool/cron/root
     echo -e  "root soft nofile 65535\nroot hard nofile 65535\n* soft nofile 65535\n* hard nofile 65535\n"     >> /etc/security/limits.conf
     sed -i 's#4096#65535#g' /etc/security/limits.d/20-nproc.conf
-    #调用模板脚本
-    newvitrulhost
-    echo
+    echoGreen "--------------------------------------------------------------------------------------------------------"
+    echoRed "服务器已初始化完毕，所做事情：1，更改默认22端口。2，更改历史命令条数与显示规则。3，安装基础软件。4，时间同步。"
+    echoGreen "--------------------------------------------------------------------------------------------------------"
 }
 
 changeipaddress(){
@@ -150,7 +155,7 @@ changeipaddress(){
             #判断文件是否规范
             [ ! -e /etc/sysconfig/network-scripts/ifcfg-eth0 ]   && echo -e "\n网卡配置文件不规范，请检查 ：\n  /etc/sysconfig/network-scripts/ifcfg-eth0\n"  &&  rm -rf $dir  &&  exit 1
             #判断IP是否可用
-            ping -c 2 $changeip  > /dev/null && echo -e "\n[$changeip]\n 该IP已在使用中，请检查\n" && exit 1 || echo "该IP可用"
+            ping -c 2 $changeip  > /dev/null && echo -e "\n[$changeip]\n 该IP已在使用中，请检查\n"   && rm -rf $dir && exit 1 || echo "该IP可用"
             #执行
             #       echo "$(hostname -I) >>> $changeip"
             sed -i 's/dhcp/static/i'  /etc/sysconfig/network-scripts/ifcfg-eth0
@@ -166,6 +171,7 @@ changeipaddress(){
             systemctl restart zabbix-agent
             echo -e "\n修改完毕，请手动重启网卡:\n    systemctl restart network\n"
             #systemctl restart network
+            rm -rf $dir
         else
             echo "输入的IP不合法"
         fi
@@ -173,6 +179,7 @@ changeipaddress(){
         xuanxiang
     fi
 }
+
 changehostname(){
     CHANGENAME=$(whiptail --title "更改主机名" --inputbox "请输入新的主机名，用-来连接" 10 60 `hostname` 3>&1 1>&2 2>&3)
     exitstatus=$?
@@ -187,19 +194,69 @@ changehostname(){
     fi
 }
 
-alili(){
+aliyun(){
     #root用户操作
-    yum -y install lrzsz net-tools vim curl wget unzip gunzip git mysql expect ntpdate
+    #root用户操作
+    useradd -m -d /home/admin -s /bin/bash admin && useradd -m -d /home/deubg -s /bin/bash debug && useradd -M -s /sbin/nologin www && sudo groupadd docker && sudo usermod -aG docker admin && sudo usermod -aG docker debug
+    yum -y install lrzsz net-tools vim curl wget unzip gzip expect ntpdate
+    echo "export HISTTIMEFORMAT=\"`whoami` : %F %T :\"" >> /etc/profile && source /etc/profile
+    echo "admin ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/admin
     sed -i 's/HISTSIZE=1000/HISTSIZE=5000/g' /etc/profile
-    sed -i 's/#Port 22/Port 10036/g' /etc/ssh/sshd_config && systemctl restart sshd
-    echo "0 */2 * * *  /usr/sbin/ntpdate  -u ntp1.aliyun.com  &> /dev/null # ntpdate" >> /var/spool/cron/root
-    echoGreen "--------------------------------------------------------------------------------------------------------"
-    echoRed "服务器已初始化完毕，所做事情：1，更改默认22端口。2，更改历史命令条数与显示规则。3，安装基础软件。4，时间同步。"
-    echoGreen "--------------------------------------------------------------------------------------------------------"
-}
+cat > /root/.bashrc << EOF
+# .bashrc
 
-A(){
-    echo -e  "\e[36m ****\n您\n选\n择\n安\n装\n的\n是\n$OPTION\n，\n现\n在\n开\n始\n安\n装\n$OPTION\n****  \e[39m"
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias untar='tar xvf '
+alias grep='grep --color=auto'
+alias getpass="openssl rand -base64 20"
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+PS1="\[\e[37;40m\][\[\e[36;40m\]\u\[\e[37;40m\]@\h \[\e[35;40m\]\W\[\e[0m\]]\$"
+EOF
+    source /root/.bashrc
+    echo "0 */2 * * *  /usr/sbin/ntpdate  -u ntp1.aliyun.com  &> /dev/null # ntpdate" >> /var/spool/cron/root
+#admin init
+    echoYellow "开始初始化admin用户"
+cat > /home/admin/.bashrc << EOF
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+PS1="\[\e[37;40m\][\[\e[36;40m\]\u\[\e[37;40m\]@\h \[\e[35;40m\]\W\[\e[0m\]]\$"
+EOF
+    chown admin.admin /home/admin/.bashrc
+
+    mkdir /home/admin/.ssh && chmod 700 /home/admin/.ssh
+cat > /home/admin/.ssh/authorized_keys << EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDL1ELizmbwk3IqubQZSJ1UdSxMfQZqJq4Zh94iZZ5QuwH3xtGPsdMJRgyr1yRWjW22K1F5qVtYhiCtTDeaCcdVJl/E8Vo88g5rdtz2khjiYeIbsPqyth8i8W2tbg1GYoEzwv06y0kAoeZv5NRHKrKSuH95/PskGbJ+LHd0vVLtob46qQLMnZdweN4KnH7jmZ8GAIGtOaYBQvxNc+RGlHzymD45KTAO35qJqeJFVLwBpFg5miM8DSYIbwLb5k7K1yUIQxxUXe8KtyGagjzNjcOeFa03/3Ol69u9DRZwmrB8CJNIz/IH8wxd0gqEPNwGwETT3RVyaX4P8VLXpPBCEcE3 admin@bastion-jenkins-40
+EOF
+    chmod 700 /home/admin/.ssh/authorized_keys && chown -R admin.admin /home/admin/.ssh
+    echoGreen "admin用户初始化完毕！"
+#debug init
+    echoYellow "开始初始化debug用户"
+    mkdir /home/debug/.ssh && chmod 700 /home/debug/.ssh
+cat > /home/debug/.ssh/authorized_keys << EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC39y6+cDbNjmHwxJlsDiDlG0jV6gG8aqDWpjns3Ah7PHohEmxvpVuFytI4YnMiqTHiUZX+GBT9vjunvConcKmLHIk5RmEL5hIR0/XqdsJJ5lYurI7dIJwD3kZ/TKmOD4zLw0I0UUj2K4C91gz0PtfvXxSspUc702vm8dWDX7ouD3JzdP2bAUINUd+MgCZi69BA1Kv7vpPADW8/QikKGIqxIjJISL5Zxu4Fc7uFR47YnvFHMuSc0XY8P0le1T1MeOT4FP36Av+DMtKM3jJSvMh4xOU3JLyDbYsHMj+fTAPh5iQPOaH0AdebBjyCZ6BL0RJqVtRd0IuDqCZ71w+mveKt debug@bastion-jenkins-40
+EOF
+    chmod 700 /home/debug/.ssh/authorized_keys && chown -R debug.debug /home/debug/.ssh
+    echoGreen "debug用户初始化完毕！"
+    echoGreen "-----------------------------------------------------------------------------------------------------------------------------------"
+    echoRed "服务器已初始化完毕，所做事情：1，初始化admin、debug、www用户。2，安装基础软件。3，添加admin用户sudo权限。4，更改历史命令条数与显示规则。5，时间同步"
+    echoGreen "-----------------------------------------------------------------------------------------------------------------------------------"
 }
 
 
@@ -210,28 +267,36 @@ A(){
 anzhuang(){
     OPTION=$(whiptail --title "运维外挂-安装脚本" --menu "请选择想要安装的项目，上下键进行选择，回车即安装，左右键可选择<Cancel>返回上层！" 25 55 15 \
         "1" "nginx-1.18.0" \
-        "2" "jdk-13" \
-        "3" "tomcat-9.0.40" \
-        "4" "mysql-5.7.31" \
-        "5" "zabbix-agent-5.0" \
-        "6" "暂时未定义"  3>&1 1>&2 2>&3  )
+        "2" "nginx-1.16.0" \
+        "3" "jdk-13" \
+        "4" "tomcat-9.0.40" \
+        "5" "mysql-5.7.31" \
+        "6" "redis-6.0.6" \
+        "7" "docker" \
+        "8" "暂时未定义"  3>&1 1>&2 2>&3  )
     case $OPTION in
     1)
-        A && nginx
+        nginx
         ;;
     2)
-        A && jdk13
+        nginx1.6.0
         ;;
     3)
-        A && tomcat
+        jdk13
         ;;
     4)
-        A && mysql
+        tomcat
         ;;
     5)
-        A && zabbix
+        mysql
         ;;
     6)
+        redis
+        ;;
+    7)
+        docker
+        ;;
+    8)
         echo -e  "\e[36m ****您选择的安装项目暂时未定义！****\e[39m" && exit 1
         ;;
     *) 
@@ -241,36 +306,26 @@ anzhuang(){
 }
 
 chushihua(){
-    OPTION=$(whiptail --title "运维外挂-初始化菜单" --menu \
-    "请选择想要初始化的选项，上下键进行选择，回车即运行，左右键可选择<Cancel>返回上层！" 25 50 10 \
-    "1" "虚拟机 moban clone host" \
-    "2" "init a new CeontOS" \
-    "3" "zabbix agent" \
-    "4" "vmtools" \
-    "5" "change ip address" \
-    "6" "change hostname"  \
-    "7" "aliyun init" 3>&1 1>&2 2>&3 )
+    OPTION=$(whiptail --title "运维外挂-初始化菜单" --menu "请选择想要初始化的选项，上下键进行选择，回车即运行，左右键可选择<Cancel>返回上层！" 25 50 10 \
+    "1" "init a new CeontOS" \
+    "2" "change ip address" \
+    "3" "change hostname"  \
+    "4" "aliyun init" 3>&1 1>&2 2>&3 )
 
     case $OPTION in
     1)
-        A && sleep 3 && newvitrulhost
+        allnewcentos
         ;;
     2)
-        A && sleep 3 && allnewcentos
+        changeipaddress
         ;;
     3)
-        A && sleep 3 && zabbix
+        changehostname
         ;;
     4)
-        A && changeipaddress
+        aliyun
         ;;
-    5)
-        A && changehostname
-        ;;
-    6)
-        A && alili
-        ;;
-    *) 
+    *)
         xuanxiang
         ;;
     esac
