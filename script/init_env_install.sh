@@ -248,6 +248,21 @@ EOF
     echoGreen "admin用户初始化完毕！"
 #debug init
     echoYellow "开始初始化debug用户"
+cat > /home/admin/.bashrc << EOF
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+PS1="\[\e[37;40m\][\[\e[36;40m\]\u\[\e[37;40m\]@\h \[\e[35;40m\]\W\[\e[0m\]]\$"
+EOF
+    chown debug.debug /home/debug/.bashrc
+
     mkdir /home/debug/.ssh && chmod 700 /home/debug/.ssh
 cat > /home/debug/.ssh/authorized_keys << EOF
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC39y6+cDbNjmHwxJlsDiDlG0jV6gG8aqDWpjns3Ah7PHohEmxvpVuFytI4YnMiqTHiUZX+GBT9vjunvConcKmLHIk5RmEL5hIR0/XqdsJJ5lYurI7dIJwD3kZ/TKmOD4zLw0I0UUj2K4C91gz0PtfvXxSspUc702vm8dWDX7ouD3JzdP2bAUINUd+MgCZi69BA1Kv7vpPADW8/QikKGIqxIjJISL5Zxu4Fc7uFR47YnvFHMuSc0XY8P0le1T1MeOT4FP36Av+DMtKM3jJSvMh4xOU3JLyDbYsHMj+fTAPh5iQPOaH0AdebBjyCZ6BL0RJqVtRd0IuDqCZ71w+mveKt debug@bastion-jenkins-40
