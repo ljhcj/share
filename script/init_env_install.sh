@@ -294,7 +294,7 @@ anzhuang(){
         nginx
         ;;
     2)
-        nginx1.6.0
+        nginx1.16.0
         ;;
     3)
         jdk13
