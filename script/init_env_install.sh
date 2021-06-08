@@ -51,7 +51,8 @@ EOF
 nginx1.16.0(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/nginx ] && echoRed "检测到/usr/local下已安装nginx，故而退出!" && rm -rf $dir/nginx-* && exit 1
-    wget -nc https://github.com/ljhcj/share/raw/master/nginx-1.16.0.tar.gz && sudo tar -xvf nginx-1.16.0.tar.gz -C /usr/local/
+    #wget -nc https://github.com/ljhcj/share/raw/master/nginx-1.16.0.tar.gz 
+    wget -nc http://dev-yckj-pic.eubggroup.com/nginx-1.16.0.tar.gz && sudo tar -xvf nginx-1.16.0.tar.gz -C /usr/local/
     yum install gcc gcc-c++ pcre pcre pcre-devel zlib zlib-devel openssl openssl-devel -y
     cd /usr/local/
     sudo chown www:www -R client_body_temp/ && sudo chown www:www -R fastcgi_temp/ && sudo chown www:www -R proxy_temp/ && sudo chown www:www -R scgi_temp/ && sudo chown www:www -R uwsgi_temp/
