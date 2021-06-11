@@ -2,27 +2,24 @@ FROM alpine:3.13.3
 
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8
 ENV JAVA_HOME=/usr/local/jdk
-ENV JAVA_DOWNLOAD=
 
-ADD glibc-2.33-r0.apk /tmp
-ADD glibc-bin-2.33-r0.apk /tmp
-ADD glibc-i18n-2.33-r0.apk /tmp
-ADD locale.md /tmp
-ADD ttf-dejavu.tar.gz /tmp
-
-RUN cd /tmp \
-    && apk add --update --no-cache --virtual=build-dependencies curl wget tzdata ttf-dejavu bash ca-certificates tar \
-    && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub \
-    && apk add --no-cache glibc-2.33-r0.apk glibc-bin-2.33-r0.apk glibc-i18n-2.33-r0.apk \
-    && tar -xvf ttf-dejavu.tar.gz -C /usr/share/fonts/ \
-    && curl -jfksSLH "Cookie: oraclelicense=accept-securebackup-cookie" \
-    "${JAVA_DOWNLOAD:-$(curl -s https://lv.binarybabel.org/catalog-api/java/jdk8.txt?p=downloads.tgz)}" \
-    | tar -xzf - -C /usr/local/ \
-    && ln -s /usr/local/jdk1.*.0_* /usr/local/jdk \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \ 
-    && echo "Asia/Shanghai" > /etc/timezone \
-    && cat locale.md | xargs -i /usr/glibc-compat/bin/localedef -i {} -f UTF-8 {}.UTF-8 \
-    && rm -rf ${JAVA_HOME}/*src.zip \
+RUN mkdir -p /usr/local/src/ && cd /usr/local/src/ && \
+    apk add --update --no-cache --virtual=build-dependencies wget tzdata ttf-dejavu fontconfig bash ca-certificates tar && \
+    wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub && \
+    wget -q https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.33-r0/glibc-2.33-r0.apk && \
+    wget -q https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.33-r0/glibc-bin-2.33-r0.apk && \
+    wget -q https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.33-r0/glibc-i18n-2.33-r0.apk && \
+    apk add --no-cache glibc-2.33-r0.apk glibc-bin-2.33-r0.apk glibc-i18n-2.33-r0.apk && \
+    mv /usr/glibc-compat/lib/ld-linux-x86-64.so.2 /usr/glibc-compat/lib/ld-linux-x86-64.so && \
+    ln -s /usr/glibc-compat/lib/ld-linux-x86-64.so /usr/glibc-compat/lib/ld-linux-x86-64.so.2 && \
+    wget -q --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" \ 
+    http://download.oracle.com/otn-pub/java/jdk/8u291-b10/d7fc238d0cbf4b0dac67be84580cfb4b/jdk-8u291-linux-x64.tar.gz && \
+    tar -xf jdk-8u291-linux-x64.tar.gz -C /usr/local/ && \
+    ln -s /usr/local/jdk1.*.0_* /usr/local/jdk && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \ 
+    echo "Asia/Shanghai" > /etc/timezone && \
+    /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true && \
+    rm -rf ${JAVA_HOME}/*src.zip \
            ${JAVA_HOME}/THIRDPARTYLICENSEREADME* \
            ${JAVA_HOME}/lib/missioncontrol \
            ${JAVA_HOME}/lib/visualvm \
@@ -44,7 +41,7 @@ RUN cd /tmp \
            ${JAVA_HOME}/lib/amd64/libjavafx*.so \
            ${JAVA_HOME}/lib/amd64/libjfx*.so \
            /var/cache/apk/* \
-           /tmp/*
+           /usr/local/src/* 
 
 ENV JAVA_HOME /usr/local/jdk
 ENV PATH ${PATH}:${JAVA_HOME}/bin
