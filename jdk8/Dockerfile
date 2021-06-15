@@ -2,6 +2,7 @@ FROM alpine:3.13.3
 
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8
 ENV JAVA_HOME=/usr/local/jdk
+ENV PATH ${PATH}:${JAVA_HOME}/bin
 
 RUN mkdir -p /usr/local/src/ && cd /usr/local/src/ && \
     apk add --update --no-cache --virtual=build-dependencies wget tzdata ttf-dejavu fontconfig bash ca-certificates tar && \
@@ -72,8 +73,3 @@ RUN mkdir -p /usr/local/src/ && cd /usr/local/src/ && \
            ${JAVA_HOME}/jre/lib/amd64/"libjavafx*.so \
            ${JAVA_HOME}/jre/lib/amd64/"libjfx*.so \
            /usr/local/src/* 
-
-ENV JAVA_HOME /usr/local/jdk
-ENV PATH ${PATH}:${JAVA_HOME}/bin
-
-WORKDIR /
