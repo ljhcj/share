@@ -1,8 +1,6 @@
 FROM alpine:3.13.3
-
 ENV JAVA_HOME=/usr/lib/jvm/java-15-oracle \
     PATH="/usr/lib/jvm/java-15-oracle/bin:$PATH"
-
 RUN GLIBC_VERSION=2.31-r0 && \
     ZLIB_VERSION=1.2.11-4 && \
     JAVA_VERSION=15.0.2 && \
