@@ -1,5 +1,5 @@
 FROM alpine:3.13.3
-#
+
 ENV JAVA_HOME=/usr/lib/jvm/java-15-oracle \
     PATH="/usr/lib/jvm/java-15-oracle/bin:$PATH"
     
