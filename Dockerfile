@@ -1,6 +1,6 @@
 FROM alpine:3.14
 
-ENV NODE_VERSION 17.1.0
+ENV NODE_VERSION 12.22.7
 
 RUN addgroup -g 1000 node \
     && adduser -u 1000 -G node -s /bin/sh -D node \
@@ -12,7 +12,7 @@ RUN addgroup -g 1000 node \
       && case "${alpineArch##*-}" in \
         x86_64) \
           ARCH='x64' \
-          CHECKSUM="2a1978a4384d57cf4f68794a45dc6c934303033fc4f471b7c113f31eb2b1a8f6" \
+          CHECKSUM="c8672a664087e96b4e2804caf77a0aaa8c1375ae6b378edb220a678155383a81" \
           ;; \
         *) ;; \
       esac \
@@ -33,7 +33,7 @@ RUN addgroup -g 1000 node \
         libgcc \
         linux-headers \
         make \
-        python3 \
+        python2 \
     # gpg keys listed at https://github.com/nodejs/node#release-keys
     && for key in \
       4ED778F539E3634C779C87C6D7062848A1AB005C \
@@ -91,5 +91,8 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar bash \
   && apk del .build-deps-yarn \
   # smoke test
   && yarn --version
+
+COPY docker-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 CMD [ "node" ]
