@@ -198,7 +198,7 @@ changehostname(){
 aliyun(){
     #root用户操作
     #root用户操作
-    useradd -m -d /home/admin -s /bin/bash admin && useradd -m -d /home/deubg -s /bin/bash debug && useradd -M -s /sbin/nologin www && sudo groupadd docker && sudo usermod -aG docker admin && sudo usermod -aG docker debug
+    useradd -m -d /home/admin -s /bin/bash admin && useradd -m -d /home/debug -s /bin/bash debug && useradd -M -s /sbin/nologin www && sudo groupadd docker && sudo usermod -aG docker admin && sudo usermod -aG docker debug
     yum -y install lrzsz net-tools vim curl wget unzip gzip expect ntpdate
     echo "export HISTTIMEFORMAT=\"`whoami` : %F %T :\"" >> /etc/profile && source /etc/profile
     echo "admin ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/admin
@@ -249,7 +249,7 @@ EOF
     echoGreen "admin用户初始化完毕！"
 #debug init
     echoYellow "开始初始化debug用户"
-cat > /home/admin/.bashrc << EOF
+cat > /home/debug/.bashrc << EOF
 # .bashrc
 
 # Source global definitions
