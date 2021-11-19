@@ -54,9 +54,9 @@ nginx1.16.0(){
     #wget -nc https://github.com/ljhcj/share/raw/master/nginx-1.16.0.tar.gz 
     wget -nc http://dev-yckj-pic.eubggroup.com/nginx-1.16.0.tar.gz && sudo tar -xvf nginx-1.16.0.tar.gz -C /usr/local/
     yum install gcc gcc-c++ pcre pcre pcre-devel zlib zlib-devel openssl openssl-devel -y
-    cd /usr/local/
+    cd /usr/local/nginx/
     sudo chown www:www -R client_body_temp/ && sudo chown www:www -R fastcgi_temp/ && sudo chown www:www -R proxy_temp/ && sudo chown www:www -R scgi_temp/ && sudo chown www:www -R uwsgi_temp/
-    cd /usr/local/nginx/sbin/ && sudo cp nginx /etc/init.d/ && sudo mkdir -p /wwwroot/logs/nginx/ && sudo chown www:www -R /wwwroot/logs/nginx/
+    cd /usr/local/nginx/sbin/ && sudo wget -P /etc/init.d/ https://raw.githubusercontent.com/ljhcj/share/master/script/nginx && sudo mkdir -p /wwwroot/logs/nginx/ && sudo chown www:www -R /wwwroot/logs/nginx/
     sudo ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx && sudo /etc/init.d/nginx
     /usr/local/nginx/sbin/nginx -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
 }
