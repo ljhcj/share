@@ -224,6 +224,7 @@ PS1="\[\e[37;40m\][\[\e[36;40m\]\u\[\e[37;40m\]@\h \[\e[35;40m\]\W\[\e[0m\]]\$"
 EOF
     source /root/.bashrc
     echo "0 */2 * * *  /usr/sbin/ntpdate  -u ntp1.aliyun.com  &> /dev/null # ntpdate" >> /var/spool/cron/root
+    echo "$(hostname -i) $(hostname)" >> /etc/hosts
 #admin init
     echoYellow "开始初始化admin用户"
 cat > /home/admin/.bashrc << EOF
