@@ -268,7 +268,7 @@ EOF
 
     mkdir /home/debug/.ssh && chmod 700 /home/debug/.ssh
 cat > /home/debug/.ssh/authorized_keys << EOF
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC39y6+cDbNjmHwxJlsDiDlG0jV6gG8aqDWpjns3Ah7PHohEmxvpVuFytI4YnMiqTHiUZX+GBT9vjunvConcKmLHIk5RmEL5hIR0/XqdsJJ5lYurI7dIJwD3kZ/TKmOD4zLw0I0UUj2K4C91gz0PtfvXxSspUc702vm8dWDX7ouD3JzdP2bAUINUd+MgCZi69BA1Kv7vpPADW8/QikKGIqxIjJISL5Zxu4Fc7uFR47YnvFHMuSc0XY8P0le1T1MeOT4FP36Av+DMtKM3jJSvMh4xOU3JLyDbYsHMj+fTAPh5iQPOaH0AdebBjyCZ6BL0RJqVtRd0IuDqCZ71w+mveKt debug@bastion-jenkins-40
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRq5z/3zE5TODLxs0ERRGMOPxbhWHyhSBOL+60kmk5rEFOD0JksDWPeTTEifcLdACEXmczndYUNIK2KTM+ZD/NgCwLEtOFP5yTJqSa7Z//LPrtx00J23cBwEoC9wZsaieXnf7Ax4PyADGqs6NBDiZzx/BK79ygr9MN2FRHDZ6NLR4QQAlu1343sijwH3qOaX0iWiBCPY6oU7vQyBsMeWKlX+zGOsGXJvZUnasR1ubf4oy8/5foLlPfC5b94BB1W1QoDDoONUQbhTplH/RFjYHuSQi1116cvzYJ9ROLZlr+CiAV9LH8vpBdO06wlv19kuLI1g4wZ1ohhQRr3dcKtsvT debug@bastion-jenkins-40
 EOF
     chmod 700 /home/debug/.ssh/authorized_keys && chown -R debug.debug /home/debug/.ssh
     echoGreen "debug用户初始化完毕！"
