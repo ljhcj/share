@@ -48,15 +48,27 @@ EOF
     rm -rf $dir/nginx-*
 }
 
-nginx1.16.0(){
+nginx1.16.1(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/nginx ] && echoRed "检测到/usr/local下已安装nginx，故而退出!" && rm -rf $dir/nginx-* && exit 1
-    #wget -nc https://github.com/ljhcj/share/raw/master/nginx-1.16.0.tar.gz 
     wget -nc https://dev-yckj-pic.eubggroup.com/nginx-1.16.1.tar.gz && sudo tar -xvf nginx-1.16.1.tar.gz -C /usr/local/
     yum install gcc gcc-c++ pcre pcre pcre-devel zlib zlib-devel openssl openssl-devel -y
     cd /usr/local/nginx/
     sudo chown www:www -R client_body_temp/ && sudo chown www:www -R fastcgi_temp/ && sudo chown www:www -R proxy_temp/ && sudo chown www:www -R scgi_temp/ && sudo chown www:www -R uwsgi_temp/
-    cd /usr/local/nginx/sbin/ && sudo wget -P /etc/init.d/ https://raw.githubusercontent.com/ljhcj/share/master/script/nginx && sudo chmod 755 /etc/init.d/nginx && sudo mkdir -p /wwwroot/logs/nginx/ && sudo chown www:www -R /wwwroot/logs/nginx/
+    cd /usr/local/nginx/sbin/ && sudo wget -P /etc/init.d/ https://gitee.com/ljhcj/share/raw/master/soft/nginx && sudo chmod 755 /etc/init.d/nginx && sudo mkdir -p /wwwroot/logs/nginx/ && sudo chown www:www -R /wwwroot/logs/nginx/
+    sudo chkconfig nginx on && sudo /etc/init.d/nginx start
+    sudo ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx && sudo /etc/init.d/nginx
+    /usr/local/nginx/sbin/nginx -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
+}
+
+nginx1.21.4(){
+    cd $dir && wget -V &> /dev/null || yum -y install wget
+    [ -d /usr/local/nginx ] && echoRed "检测到/usr/local下已安装nginx，故而退出!" && rm -rf $dir/nginx-* && exit 1
+    wget -nc https://pic.eubggroup.com/nginx-1.21.4.tar.gz && sudo tar -xvf nginx-1.21.4.tar.gz -C /usr/local/
+    yum install gcc gcc-c++ pcre pcre pcre-devel zlib zlib-devel openssl openssl-devel -y
+    cd /usr/local/nginx/
+    sudo chown www:www -R client_body_temp/ && sudo chown www:www -R fastcgi_temp/ && sudo chown www:www -R proxy_temp/ && sudo chown www:www -R scgi_temp/ && sudo chown www:www -R uwsgi_temp/
+    sudo wget -P /etc/init.d/ https://gitee.com/ljhcj/share/raw/master/soft/nginx && sudo chmod 755 /etc/init.d/nginx && sudo mkdir -p /wwwroot/logs/nginx/ && sudo chown www:www -R /wwwroot/logs/nginx/
     sudo chkconfig nginx on && sudo /etc/init.d/nginx start
     sudo ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx && sudo /etc/init.d/nginx
     /usr/local/nginx/sbin/nginx -V &> /dev/null && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
@@ -65,7 +77,7 @@ nginx1.16.0(){
 tomcat(){
     cd $dir && wget -V &> /dev/null || yum -y install wget
     [ -d /usr/local/tomcat ] && echoRed "检测到/usr/local下已安装tomcat，故而退出！" && rm -rf $dir/apache-tomcat-* && exit 1
-    wget -nc https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.40/bin/apache-tomcat-9.0.40.tar.gz && tar -xvzf apache-tomcat-9.0.40.tar.gz && mv apache-tomcat-9.0.40 /usr/local/tomcat
+    wget -nc https://pic.eubggroup.com/nginx-1.21.4.tar.gz && tar -xvzf apache-tomcat-9.0.40.tar.gz && mv apache-tomcat-9.0.40 /usr/local/tomcat
     cp /usr/local/tomcat/bin/catalina.sh /etc/init.d/ && mv /etc/init.d/catalina.sh /etc/init.d/tomcat && chmod 777 /etc/init.d/tomcat
     sed -i '2a#chkconfig: 2345 10 90' /etc/init.d/tomcat && sed -i '3a#description: tomcat service' /etc/init.d/tomcat && sed -i '4aexport CATALINA_HOME=/usr/local/tomcat/' /etc/init.d/tomcat && sed -i '5aexport JAVA_HOME=/usr/local/jdk-13' /etc/init.d/tomcat && sed -i '6aexport JAVA_OPTS="$JAVA_OPTS -Duser.timezone=Asia/shanghai"' /etc/init.d/tomcat
     chkconfig --add tomcat && systemctl start tomcat && chmod 777 /etc/rc.d/rc.local && echoGreen "已完成安装，可尽情享用！" || echoYellow "可能安装有问题，请检查！"
@@ -196,8 +208,7 @@ changehostname(){
     fi
 }
 
-aliyun(){
-    #root用户操作
+YCBLaliyun(){
     #root用户操作
     useradd -m -d /home/admin -s /bin/bash admin && useradd -m -d /home/debug -s /bin/bash debug && useradd -M -s /sbin/nologin www && sudo groupadd docker && sudo usermod -aG docker admin && sudo usermod -aG docker debug
     yum -y install lrzsz net-tools vim curl wget unzip gzip expect ntpdate
@@ -284,8 +295,8 @@ EOF
 
 anzhuang(){
     OPTION=$(whiptail --title "运维外挂-安装脚本" --menu "请选择想要安装的项目，上下键进行选择，回车即安装，左右键可选择<Cancel>返回上层！" 25 55 15 \
-        "1" "nginx-1.18.0" \
-        "2" "nginx-1.16.0" \
+        "1" "nginx-1.21.4" \
+        "2" "nginx-1.16.1" \
         "3" "jdk-13" \
         "4" "tomcat-9.0.40" \
         "5" "mysql-5.7.31" \
@@ -294,10 +305,10 @@ anzhuang(){
         "8" "暂时未定义"  3>&1 1>&2 2>&3  )
     case $OPTION in
     1)
-        nginx
+        nginx1.21.4
         ;;
     2)
-        nginx1.16.0
+        nginx1.16.1
         ;;
     3)
         jdk13
@@ -328,7 +339,7 @@ chushihua(){
     "1" "init a new CeontOS" \
     "2" "change ip address" \
     "3" "change hostname"  \
-    "4" "aliyun init" 3>&1 1>&2 2>&3 )
+    "4" "YCBL aliyun init" 3>&1 1>&2 2>&3 )
 
     case $OPTION in
     1)
@@ -341,7 +352,7 @@ chushihua(){
         changehostname
         ;;
     4)
-        aliyun
+        YCBLaliyun
         ;;
     *)
         xuanxiang
