@@ -149,8 +149,8 @@ allnewcentos(){
     echo "export  HISTTIMEFORMAT=\"`whoami` : %F %T :\""  >>  /etc/profile   && source /etc/profile && echo "source /opt/rh/devtoolset-7/enable" >> ~/.bash_profile
     getenforce && setenforce 0 && sed -i  's/SELINUX=enforcing/SELINUX=disabled/g'  /etc/selinux/config && sed -i '/swap/s/^/#/' /etc/fstab
     systemctl stop firewalld && systemctl disable firewalld
-   # firewall-cmd --permanent --add-port=7788/tcp && firewall-cmd --reload
-   # sed -i 's/\\u@\\h\ /\\u@\\H\ /g' /etc/bashrc && sed -i 's/HISTSIZE=1000/HISTSIZE=5000/g' /etc/profile && sed -i 's/#Port 22/Port 7788/g' /etc/ssh/sshd_config && systemctl restart sshd
+    firewall-cmd --permanent --add-port=3640/tcp && firewall-cmd --reload
+    sed -i 's/\\u@\\h\ /\\u@\\H\ /g' /etc/bashrc && sed -i 's/HISTSIZE=1000/HISTSIZE=5000/g' /etc/profile && sed -i 's/#Port 22/Port 3640/g' /etc/ssh/sshd_config && systemctl restart sshd
     echo "0 */2 * * *  /usr/sbin/ntpdate  -u ntp1.aliyun.com  &> /dev/null # ntpdate" >> /var/spool/cron/root
     echo -e  "root soft nofile 65535\nroot hard nofile 65535\n* soft nofile 65535\n* hard nofile 65535\n"     >> /etc/security/limits.conf
     sed -i 's#4096#65535#g' /etc/security/limits.d/20-nproc.conf
@@ -256,7 +256,7 @@ EOF
 
     mkdir /home/admin/.ssh && chmod 700 /home/admin/.ssh
 cat > /home/admin/.ssh/authorized_keys << EOF
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDL1ELizmbwk3IqubQZSJ1UdSxMfQZqJq4Zh94iZZ5QuwH3xtGPsdMJRgyr1yRWjW22K1F5qVtYhiCtTDeaCcdVJl/E8Vo88g5rdtz2khjiYeIbsPqyth8i8W2tbg1GYoEzwv06y0kAoeZv5NRHKrKSuH95/PskGbJ+LHd0vVLtob46qQLMnZdweN4KnH7jmZ8GAIGtOaYBQvxNc+RGlHzymD45KTAO35qJqeJFVLwBpFg5miM8DSYIbwLb5k7K1yUIQxxUXe8KtyGagjzNjcOeFa03/3Ol69u9DRZwmrB8CJNIz/IH8wxd0gqEPNwGwETT3RVyaX4P8VLXpPBCEcE3 admin@bastion-jenkins-40
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC3tHmldgIa0l0P/ejd3O4dZLlnD2YyjIzycSXHNVpw1b45PMgiwEzrIMdC/eD0fU4O0uOftBhhW0CqkRXC8/SYLlG8QkdPM+C0ElSCslZ+QNmsLN7NgAy9512pFOgEcD+l0U5cjlZkTRT+jn9CGxpUbeoqCYrv4GXCD4RyoLexBg8MN7vk/r0JRsj8Bvf/MYKxUz0BuxC09dR7WvF6SdQyKklyB70L3EDJJnoG7xWu7UeuRoUzTN8JQ0T8b5uOsRHeRRco1EDgwJfGBWf6GdMwllx62XSlQlhTmqN5kiuu7eoJi2VNmxp1IWYAXnkFG0rpUJ1ETVQ1Vfsv7GxupkvJ admin@test-server
 EOF
     chmod 700 /home/admin/.ssh/authorized_keys && chown -R admin.admin /home/admin/.ssh
     echoGreen "admin用户初始化完毕！"
@@ -279,7 +279,7 @@ EOF
 
     mkdir /home/debug/.ssh && chmod 700 /home/debug/.ssh
 cat > /home/debug/.ssh/authorized_keys << EOF
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRq5z/3zE5TODLxs0ERRGMOPxbhWHyhSBOL+60kmk5rEFOD0JksDWPeTTEifcLdACEXmczndYUNIK2KTM+ZD/NgCwLEtOFP5yTJqSa7Z//LPrtx00J23cBwEoC9wZsaieXnf7Ax4PyADGqs6NBDiZzx/BK79ygr9MN2FRHDZ6NLR4QQAlu1343sijwH3qOaX0iWiBCPY6oU7vQyBsMeWKlX+zGOsGXJvZUnasR1ubf4oy8/5foLlPfC5b94BB1W1QoDDoONUQbhTplH/RFjYHuSQi1116cvzYJ9ROLZlr+CiAV9LH8vpBdO06wlv19kuLI1g4wZ1ohhQRr3dcKtsvT debug@bastion-jenkins-40
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9Sti3MZpv8slr0cIsVi0OFlm/dzCL76Pi51hqqSuNnui9hLiXFBXePL3bIJ2C6jN8XmARil61SqkNG/iBsEk+zK9wEGV1B0zZZL3PPvnvFAf0wI7dy4OkNufSnNeu/TSWnjNpyNs1SX9s71HW+1aHR59P+iWeTkemNifVgAE3wpp9rBQcWTKMVgAbbBED8ZC/xgsgs2WFhSDMoNAV2BobL00BaO1Hq5d9CW1lOX3tocVPZ0wTBNUz5e8I0sBqQyI09clR/TwZzJuvKA1T1+xNDFWxBMc1+JVINU1CRhB94YYpXg921IellWutfFLPO9oOM9VzM8uBGINks/fjXOxd debug@test-server
 EOF
     chmod 700 /home/debug/.ssh/authorized_keys && chown -R debug.debug /home/debug/.ssh
     echoGreen "debug用户初始化完毕！"
