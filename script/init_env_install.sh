@@ -256,7 +256,7 @@ EOF
 
     mkdir /home/admin/.ssh && chmod 700 /home/admin/.ssh
 cat > /home/admin/.ssh/authorized_keys << EOF
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5Uv5fmLVcWzijWMW8ppEh4GiaoL2dHva+RaZ+GwpSWugKl0oZayvKCWygmeTzVihZDa6iNJV+pXmLgYxtfBhf7d+KD8kRnPcQTtfjWTvYQ2bjdVaxFJb7f2puBREMneDsbaJIyf2Tmmw+tuqABHAdu9mXXPa5BkezSUfaGJfuBmjMer42K2lJMp9maXeZaRE1yrn5mATHHl5xm6uOAQaQHNbD6FrT4U550Ct3X/OzYtETEk9ZVjIf1qkVeRTL/pfI846LGwlUtoC2XgX8X0iMT4MXYXv35G+09CLZBVdWTSLTFzQXZ2ERfZgD1WLRTrxkvlV/obRw2QwJocNRNLR5 admin@banli-dev-106
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4DULt9ry08yOn5nPKzAOVIoHElkb48A+67Gbsn5l6Yu82ogXA7dp4ZcmI1kaTMBu0FGUsYvlFqS3pKTNlLwAumq+/yRmmGeZzBC4OxELtIVTw6aq2WPFHQLPUmqjLh1eSOJQ/8p+wtTC/hTw3XtV/0vo1kKgqcY/9ZV4yhCLNiWrbPIUR7XlYLaErUMYwy4ScqjFCdISXWy4BIJB5OQ6+v54ulcYTeew0d7E1kgWqoggLpPBmS7iKRmOYmSTsFjSm9fz3t2SAFini7EpfvZx5NOLS+eFSuDfQfH6VJ/AD9Ke6of7HqjoFdiuRucg32CE+SBaSZolxm2C4Z+XZzHfd admin@banli-dev-106
 EOF
     chmod 700 /home/admin/.ssh/authorized_keys && chown -R admin.admin /home/admin/.ssh
     echoGreen "admin用户初始化完毕！"
