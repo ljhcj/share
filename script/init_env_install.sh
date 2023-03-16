@@ -256,7 +256,7 @@ EOF
 
     mkdir /home/admin/.ssh && chmod 700 /home/admin/.ssh
 cat > /home/admin/.ssh/authorized_keys << EOF
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC3tHmldgIa0l0P/ejd3O4dZLlnD2YyjIzycSXHNVpw1b45PMgiwEzrIMdC/eD0fU4O0uOftBhhW0CqkRXC8/SYLlG8QkdPM+C0ElSCslZ+QNmsLN7NgAy9512pFOgEcD+l0U5cjlZkTRT+jn9CGxpUbeoqCYrv4GXCD4RyoLexBg8MN7vk/r0JRsj8Bvf/MYKxUz0BuxC09dR7WvF6SdQyKklyB70L3EDJJnoG7xWu7UeuRoUzTN8JQ0T8b5uOsRHeRRco1EDgwJfGBWf6GdMwllx62XSlQlhTmqN5kiuu7eoJi2VNmxp1IWYAXnkFG0rpUJ1ETVQ1Vfsv7GxupkvJ admin@test-server
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5Uv5fmLVcWzijWMW8ppEh4GiaoL2dHva+RaZ+GwpSWugKl0oZayvKCWygmeTzVihZDa6iNJV+pXmLgYxtfBhf7d+KD8kRnPcQTtfjWTvYQ2bjdVaxFJb7f2puBREMneDsbaJIyf2Tmmw+tuqABHAdu9mXXPa5BkezSUfaGJfuBmjMer42K2lJMp9maXeZaRE1yrn5mATHHl5xm6uOAQaQHNbD6FrT4U550Ct3X/OzYtETEk9ZVjIf1qkVeRTL/pfI846LGwlUtoC2XgX8X0iMT4MXYXv35G+09CLZBVdWTSLTFzQXZ2ERfZgD1WLRTrxkvlV/obRw2QwJocNRNLR5 admin@banli-dev-106
 EOF
     chmod 700 /home/admin/.ssh/authorized_keys && chown -R admin.admin /home/admin/.ssh
     echoGreen "admin用户初始化完毕！"
@@ -279,7 +279,7 @@ EOF
 
     mkdir /home/debug/.ssh && chmod 700 /home/debug/.ssh
 cat > /home/debug/.ssh/authorized_keys << EOF
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9Sti3MZpv8slr0cIsVi0OFlm/dzCL76Pi51hqqSuNnui9hLiXFBXePL3bIJ2C6jN8XmARil61SqkNG/iBsEk+zK9wEGV1B0zZZL3PPvnvFAf0wI7dy4OkNufSnNeu/TSWnjNpyNs1SX9s71HW+1aHR59P+iWeTkemNifVgAE3wpp9rBQcWTKMVgAbbBED8ZC/xgsgs2WFhSDMoNAV2BobL00BaO1Hq5d9CW1lOX3tocVPZ0wTBNUz5e8I0sBqQyI09clR/TwZzJuvKA1T1+xNDFWxBMc1+JVINU1CRhB94YYpXg921IellWutfFLPO9oOM9VzM8uBGINks/fjXOxd debug@test-server
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQChc1nbqnWeDxIFnsn2z1n+wahlEn0QVrnkXSiRzmYNpghkT1lzq+E8JrPQxCCljWDp37IPQ0e+cK43smK+6RDc/G1tQrqo+0cpaggRxUbB8valMXhtdLFI89N4PipobPd1LV5V1zmnFMzFnrqb7p/18itN/joODqZc+EPNq4/bhVO9wpkKhwZEYrSeV0SBbaNfP+A5gcsETtpN0c9/jpxFuTvvi1PEtC2DNxtDiSTuPtGfKd9qC1MJ3kwpix4IurialmXT7OGf4+TmSahOYN3pK7RzhwuVnZRyZPLrUunT4LePzec0DARPNzjXOsCp8kS8vkVbDq+Uti6qmO3B3bp7 debug@banli-dev-106
 EOF
     chmod 700 /home/debug/.ssh/authorized_keys && chown -R debug.debug /home/debug/.ssh
     echoGreen "debug用户初始化完毕！"
