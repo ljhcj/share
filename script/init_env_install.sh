@@ -149,8 +149,8 @@ allnewcentos(){
     echo "export  HISTTIMEFORMAT=\"`whoami` : %F %T :\""  >>  /etc/profile   && source /etc/profile && echo "source /opt/rh/devtoolset-7/enable" >> ~/.bash_profile
     getenforce && setenforce 0 && sed -i  's/SELINUX=enforcing/SELINUX=disabled/g'  /etc/selinux/config && sed -i '/swap/s/^/#/' /etc/fstab
     systemctl stop firewalld && systemctl disable firewalld
-    firewall-cmd --permanent --add-port=3640/tcp && firewall-cmd --reload
-    sed -i 's/\\u@\\h\ /\\u@\\H\ /g' /etc/bashrc && sed -i 's/HISTSIZE=1000/HISTSIZE=5000/g' /etc/profile && sed -i 's/#Port 22/Port 3640/g' /etc/ssh/sshd_config && systemctl restart sshd
+    #firewall-cmd --permanent --add-port=3640/tcp && firewall-cmd --reload
+    #sed -i 's/\\u@\\h\ /\\u@\\H\ /g' /etc/bashrc && sed -i 's/HISTSIZE=1000/HISTSIZE=5000/g' /etc/profile && sed -i 's/#Port 22/Port 3640/g' /etc/ssh/sshd_config && systemctl restart sshd
     echo "0 */2 * * *  /usr/sbin/ntpdate  -u ntp1.aliyun.com  &> /dev/null # ntpdate" >> /var/spool/cron/root
     echo -e  "root soft nofile 65535\nroot hard nofile 65535\n* soft nofile 65535\n* hard nofile 65535\n"     >> /etc/security/limits.conf
     sed -i 's#4096#65535#g' /etc/security/limits.d/20-nproc.conf
